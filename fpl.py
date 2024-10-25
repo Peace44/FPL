@@ -256,13 +256,13 @@ for player_dict in players_stats:
     player_dict['form'], player_dict['MeanAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "mean") ### form is a player's average score per match, calculated from all matches played by his club in the last 30 days.
     player_dict['med_form'], player_dict['MedAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "median")
 
-    player_dict['std_pts_dev'] = np.std(player_fixturesPlayedPts + player_fixturesNotPlayedPts) if len(player_fixturesPlayedPts + player_fixturesNotPlayedPts) > 0 else 0
-    player_dict['avg_pts/fixture'], player_dict['MeanAbsDev(avg_pts/fixture)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "mean") ### avg_pts/fixture is a player's average score per match, calculated from all matches played by his club throughout the whole season.
-    player_dict['med_pts'], player_dict['MedAbsDev(pts)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "median")
+    player_dict['std_pts/fixture'] = np.std(player_fixturesPlayedPts + player_fixturesNotPlayedPts) if len(player_fixturesPlayedPts + player_fixturesNotPlayedPts) > 0 else 0
+    player_dict['avg_pts/fixture'], player_dict['MeanAbsDev(pts/fixture)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "mean") ### avg_pts/fixture is a player's average score per match, calculated from all matches played by his club throughout the whole season.
+    player_dict['med_pts/fixture'], player_dict['MedAbsDev(pts/fixture)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "median")
     
-    player_dict['std_pts_dev_played'] = np.std(player_fixturesPlayedPts) if len(player_fixturesPlayedPts) > 0 else 0
-    player_dict['avg_pts/fixture_played'], player_dict['MeanAbsDev(avg_pts/fixture_played)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "mean")
-    player_dict['med_pts_played'], player_dict['MedAbsDev(pts_played)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "median")
+    player_dict['std_pts/fixture_played'] = np.std(player_fixturesPlayedPts) if len(player_fixturesPlayedPts) > 0 else 0
+    player_dict['avg_pts/fixture_played'], player_dict['MeanAbsDev(pts/fixture_played)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "mean")
+    player_dict['med_pts/fixture_played'], player_dict['MedAbsDev(pts/fixture_played)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "median")
     #######################################################################################################################################################################################################################
     player_dict['xPts'] = golden_sum(player_dict['form'], player_dict['avg_pts/fixture']) # , player_dict['pts/match_played']) ### for more xPts accuracy ==> exclude pts/match_played!
 
@@ -396,24 +396,48 @@ for fixture in fixtures_data: # for fixture in upcoming_fixtures_data
         fpl_teamsAdv_dict[home_team] = fpl_teamsAdv_dict.get(home_team, 0) + fixture_dict['home_fplAdv']
         fpl_teamsAdv_dict[away_team] = fpl_teamsAdv_dict.get(away_team, 0) + fixture_dict['away_fplAdv']
 
-        players_df.loc[players_df['team'] == home_team, '^fplAdv*xPts'] += players_df['form'] + ((fixture_dict['home_fplAdv'] / 9) * players_df['MeanAbsDev(form)'])
-        players_df.loc[players_df['team'] == away_team, '^fplAdv*xPts'] += players_df['form'] + ((fixture_dict['away_fplAdv'] / 9) * players_df['MeanAbsDev(form)'])
+        players_df.loc[players_df['team'] == home_team, '^fplAdv*xPts'] += golden_sum(
+            players_df['med_pts/fixture'],
+            players_df['med_pts/fixture'],
+            (fixture_dict['home_fplAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+        )
+        players_df.loc[players_df['team'] == away_team, '^fplAdv*xPts'] += golden_sum(
+            players_df['med_pts/fixture'],
+            players_df['med_pts/fixture'],
+            (fixture_dict['away_fplAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+        )
         
         ### is ^fplAdv*xPts still the best nomenclature? I don't think so!
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         def_teamsAdv_dict[home_team] = def_teamsAdv_dict.get(home_team, 0) + fixture_dict['home_defAdv']
         def_teamsAdv_dict[away_team] = def_teamsAdv_dict.get(away_team, 0) + fixture_dict['away_defAdv']
 
-        players_df.loc[((players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')) & (players_df['team'] == home_team), '^defAdv*xPts'] += players_df['form'] + ((fixture_dict['home_defAdv'] / 9) * players_df['MeanAbsDev(form)'])
-        players_df.loc[((players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')) & (players_df['team'] == away_team), '^defAdv*xPts'] += players_df['form'] + ((fixture_dict['away_defAdv'] / 9) * players_df['MeanAbsDev(form)'])
+        players_df.loc[((players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')) & (players_df['team'] == home_team), '^defAdv*xPts'] += golden_sum(
+            players_df['med_pts/fixture'],
+            players_df['med_pts/fixture'],
+            (fixture_dict['home_defAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+        )
+        players_df.loc[((players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')) & (players_df['team'] == away_team), '^defAdv*xPts'] += golden_sum(
+            players_df['med_pts/fixture'],
+            players_df['med_pts/fixture'],
+            (fixture_dict['away_defAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+        )
 
         ### is ^defAdv*xPts still the best nomenclature? I don't think so!
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         att_teamsAdv_dict[home_team] = att_teamsAdv_dict.get(home_team, 0) + fixture_dict['home_attAdv']
         att_teamsAdv_dict[away_team] = att_teamsAdv_dict.get(away_team, 0) + fixture_dict['away_attAdv']
 
-        players_df.loc[((players_df['position'] == 'MID') | (players_df['position'] == 'FWD')) & (players_df['team'] == home_team), '^attAdv*xPts'] += players_df['form'] + ((fixture_dict['home_attAdv'] / 9) * players_df['MeanAbsDev(form)'])
-        players_df.loc[((players_df['position'] == 'MID') | (players_df['position'] == 'FWD')) & (players_df['team'] == away_team), '^attAdv*xPts'] += players_df['form'] + ((fixture_dict['away_attAdv'] / 9) * players_df['MeanAbsDev(form)'])
+        players_df.loc[((players_df['position'] == 'MID') | (players_df['position'] == 'FWD')) & (players_df['team'] == home_team), '^attAdv*xPts'] += golden_sum(
+            players_df['med_pts/fixture'],
+            players_df['med_pts/fixture'],
+            (fixture_dict['home_attAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+        )
+        players_df.loc[((players_df['position'] == 'MID') | (players_df['position'] == 'FWD')) & (players_df['team'] == away_team), '^attAdv*xPts'] += golden_sum(
+            players_df['med_pts/fixture'],
+            players_df['med_pts/fixture'],
+            (fixture_dict['away_attAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+        )
         
         ### is ^attAdv*xPts still the best nomenclature? I don't think so!
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
