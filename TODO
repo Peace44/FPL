@@ -3,4 +3,4 @@
 + Revise the nomenclature of ^fplAdv*xPts, ^defAdv*xPts, ^attAdv*xPts, ^avgAdv*xPts,
 + Add the total references to selected_teams.txt (example: Total ^fplAdv*xPts: 100.27200)
 - While simulating a particular gameweek (refGW) in the future, i should consider data up to the most recent GW, which is nxtGW-1!
-- Teams' stats, just like players' stats, should be based on the med (median) instead of the avg (average = mean) bcoz the med is more reliable than the avg (med is more robust than mean bcoz med immune to outliers)!!!
+- Teams' stats, just like players' stats, should be based on the med (median) instead of the avg (average = mean) bcoz the med is more reliable/robust than the avg (med is immune to outliers while mean isn't)!!!
