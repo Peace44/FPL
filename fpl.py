@@ -288,9 +288,9 @@ ascending=[
 
 
 
-print("\n\n\n")
-print(players_df.loc[(players_df['team'] == 'MCI')].head(37).to_string(index=False))
-print("\n\n\n")
+# print("\n\n\n")
+# print(players_df.loc[(players_df['team'] == 'MCI')].head(37).to_string(index=False))
+# print("\n\n\n")
 # print(players_df.loc[(players_df['team'] == 'ARS')].head(37).to_string(index=False))
 # print("\n\n\n")
 # print(players_df.loc[(players_df['team'] == 'LIV')].head(37).to_string(index=False))
