@@ -90,6 +90,7 @@ matches_played_dict = {k:0 for k in teams_dict.values()}
 goals_for_dict = {k:0 for k in teams_dict.values()}
 goals_against_dict = {k:0 for k in teams_dict.values()}
 clean_sheets_dict= {k:0 for k in teams_dict.values()}
+teams_fixturesPts_dict = {t: [{} for gwk in range(1, refGW)] for t in teams_dict.values()}
 
 for fixture in fixtures_data:
     if not fixture["finished"] or fixture["event"] >= max(gws):
@@ -115,14 +116,22 @@ for fixture in fixtures_data:
     if home_team_score == 0:
         clean_sheets_dict[away_team] += 1
 
+    fixture_id = fixture['id']
+    if fixture['event'] in range(1, refGW):
+        teams_fixturesPts_dict[home_team][fixture['event'] - 1][fixture_id] = 0
+        teams_fixturesPts_dict[away_team][fixture['event'] - 1][fixture_id] = 0
+
+# print('\n\n\n')
 # print(matches_played_dict)
-# print()
+# print('\n\n\n')
 # print(goals_for_dict)
-# print()
+# print('\n\n\n')
 # print(goals_against_dict)
-# print()
+# print('\n\n\n')
 # print(clean_sheets_dict)
-# print()
+# print('\n\n\n')
+# print(teams_fixturesPts_dict)
+# print('\n\n\n')
 ######################################################################################################################################################################################################################################################################################################################################
 
 
@@ -216,10 +225,12 @@ for gw in range(1, refGW): ### fetch per-gameweek data for all players
         player_id = element['id']
         if player_id not in players_fixturesPlayedPts_dict:
             players_fixturesPlayedPts_dict[player_id] = []
+        player_team = teams_dict[players_dict[player_id]['team']]
         gwMinutes = element['stats']['minutes']
         if gwMinutes > 0:
             gwFixtures = element['explain']
             for gwFixture in gwFixtures: ### sometimes we have 2ble gameweeks!
+                fixture_id = gwFixture['fixture']
                 fixture_stats = gwFixture['stats']
                 fixture_pts = sum(fixture_stat['points'] for fixture_stat in fixture_stats)
                 fixture_minutes = fixture_stats[0]['value'] if fixture_stats[0]['identifier'] == 'minutes' else None
@@ -227,6 +238,8 @@ for gw in range(1, refGW): ### fetch per-gameweek data for all players
                     players_fixturesPlayedPts_dict[player_id].append(fixture_pts)
                 else:
                     print(f"Player {player_id} with {fixture_stats[0]['value']} {fixture_stats[0]['identifier']} in fixture {gwFixture['fixture']}.")
+                if fixture_id in teams_fixturesPts_dict[player_team][gw-1]:
+                    teams_fixturesPts_dict[player_team][gw-1][fixture_id] += fixture_pts
 
 players_formFixturesPts_dict = {}
 for gw in range(form_refGW, refGW):
@@ -288,6 +301,8 @@ ascending=[
 
 
 
+# print("\n\n\n")
+# print(teams_fixturesPts_dict)
 # print("\n\n\n")
 # print(players_df.loc[(players_df['team'] == 'MCI')].head(37).to_string(index=False))
 # print("\n\n\n")
