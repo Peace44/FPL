@@ -260,33 +260,32 @@ for player_dict in players_stats:
     player_id = player_dict['id']
     player_fixturesPlayedPts = players_fixturesPlayedPts_dict.get(player_id, [])
     player_dict['tot_pts'] = np.sum(player_fixturesPlayedPts, dtype=int)
-    player_dict['fixtures_played'] = len(player_fixturesPlayedPts)
-    player_dict['fixtures_not_played'] = matches_played_dict[player_dict['team']] - player_dict['fixtures_played']
-    player_fixturesNotPlayedPts = player_dict['fixtures_not_played'] * [0]
+    player_dict['fxtrs_plyd'] = len(player_fixturesPlayedPts)
+    player_dict['fxtrs_not_plyd'] = matches_played_dict[player_dict['team']] - player_dict['fxtrs_plyd']
+    player_fixturesNotPlayedPts = player_dict['fxtrs_not_plyd'] * [0]
     player_formFixturesPts = players_formFixturesPts_dict.get(player_id, [])
     #######################################################################################################################################################################################################################    
     player_dict['med_form'], player_dict['MedAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "median")
     player_dict['avg_form'], player_dict['MeanAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "mean") ### avg_form is a player's average score per match, calculated from all matches played by his club in the last 30 days.
     player_dict['StdDev(form)'] = np.std(player_formFixturesPts) if len(player_formFixturesPts) > 0 else 0
 
-    player_dict['med_pts/fixture'], player_dict['MedAbsDev(pts/fixture)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "median")
-    player_dict['avg_pts/fixture'], player_dict['MeanAbsDev(pts/fixture)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "mean") ### avg_pts/fixture is a player's average score per match, calculated from all matches played by his club throughout the whole season.
-    player_dict['StdDev(pts/fixture)'] = np.std(player_fixturesPlayedPts + player_fixturesNotPlayedPts) if len(player_fixturesPlayedPts + player_fixturesNotPlayedPts) > 0 else 0
+    player_dict['med_pts/fxtr'], player_dict['MedAbsDev(pts/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "median")
+    player_dict['avg_pts/fxtr'], player_dict['MeanAbsDev(pts/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "mean") ### avg_pts/fxtr is a player's average score per match, calculated from all matches played by his club throughout the whole season.
+    player_dict['StdDev(pts/fxtr)'] = np.std(player_fixturesPlayedPts + player_fixturesNotPlayedPts) if len(player_fixturesPlayedPts + player_fixturesNotPlayedPts) > 0 else 0
 
-    player_dict['avg_pts/fixture_played'], player_dict['MeanAbsDev(pts/fixture_played)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "mean")
-    player_dict['med_pts/fixture_played'], player_dict['MedAbsDev(pts/fixture_played)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "median")
-    player_dict['StdDev(pts/fixture_played)'] = np.std(player_fixturesPlayedPts) if len(player_fixturesPlayedPts) > 0 else 0
+    player_dict['med_pts/fxtr_plyd'], player_dict['MedAbsDev(pts/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "median")
+    player_dict['avg_pts/fxtr_plyd'], player_dict['MeanAbsDev(pts/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "mean")
+    player_dict['StdDev(pts/fxtr_plyd)'] = np.std(player_fixturesPlayedPts) if len(player_fixturesPlayedPts) > 0 else 0
     #######################################################################################################################################################################################################################
-
 
 players_df = pd.DataFrame(players_stats).set_index('id', drop=False)
 players_df = players_df.sort_values([
     'team', 
-    'med_form',            'med_pts/fixture',          'med_pts/fixture_played',
-    'MedAbsDev(form)',     'MedAbsDev(pts/fixture)',   'MedAbsDev(pts/fixture_played)',
-    'avg_form',            'avg_pts/fixture',          'avg_pts/fixture_played',
-    'MeanAbsDev(form)',    'MeanAbsDev(pts/fixture)',  'MeanAbsDev(pts/fixture_played)',
-    'StdDev(form)',        'StdDev(pts/fixture)',      'StdDev(pts/fixture_played)',
+    'med_form',            'med_pts/fxtr',          'med_pts/fxtr_plyd',
+    'MedAbsDev(form)',     'MedAbsDev(pts/fxtr)',   'MedAbsDev(pts/fxtr_plyd)',
+    'avg_form',            'avg_pts/fxtr',          'avg_pts/fxtr_plyd',
+    'MeanAbsDev(form)',    'MeanAbsDev(pts/fxtr)',  'MeanAbsDev(pts/fxtr_plyd)',
+    'StdDev(form)',        'StdDev(pts/fxtr)',      'StdDev(pts/fxtr_plyd)',
     'tot_pts'
 ], 
 ascending=[
@@ -297,9 +296,14 @@ ascending=[
     False, False, False, 
     False, False, False, 
     False
-]) # 'form' gives you info on which players might be currently <appearing>/<playing well> or not
+]) # 'x_form' gives you info on which players might be currently <appearing>/<playing well> or not
 
-
+teams_fixturesPts_dict = {
+    team: [list(dictionary.values()) for dictionary in array_of_dictionaries] for team, array_of_dictionaries in teams_fixturesPts_dict.items()
+}
+teams_fixturesPts_dict = {
+    team: [item for sublist in list_of_lists for item in sublist] for team, list_of_lists in teams_fixturesPts_dict.items()
+}
 
 # print("\n\n\n")
 # print(teams_fixturesPts_dict)
@@ -317,7 +321,7 @@ ascending=[
 
 
 ######################################################################################################################################################################################################################################################################################################################################
-fpl_teams_stats_df = players_df.groupby('team').sum(numeric_only=True).reset_index().drop(columns=['id', 'avg_pts/fixture'], axis='columns').rename(columns={'tot_pts':'fpl_pts','avg_form':'fpl_form'})
+fpl_teams_stats_df = players_df.groupby('team').sum(numeric_only=True).reset_index().drop(columns=['id', 'avg_pts/fxtr'], axis='columns').rename(columns={'tot_pts':'fpl_pts','avg_form':'fpl_form'})
 fpl_teams_stats_df.insert(1, 'matches_played', fpl_teams_stats_df['team'].map(matches_played_dict))
 fpl_teams_stats_df.insert(3, 'fpl_pts/match', round(fpl_teams_stats_df['fpl_pts'] / fpl_teams_stats_df['matches_played'], 11))
 fpl_teams_stats_df['fpl_xPts'] = golden_sum(fpl_teams_stats_df['fpl_pts/match'], fpl_teams_stats_df['fpl_form'])
@@ -430,42 +434,42 @@ for fixture in fixtures_data: # for fixture in upcoming_fixtures_data
         fpl_teamsAdv_dict[away_team] = fpl_teamsAdv_dict.get(away_team, 0) + fixture_dict['away_fplAdv']
 
         players_df.loc[players_df['team'] == home_team, 'xPts(fplAdv)'] += golden_sum(
-            players_df['med_pts/fixture'],
-            players_df['med_pts/fixture'],
-            (fixture_dict['home_fplAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+            players_df['med_pts/fxtr'],
+            players_df['med_pts/fxtr'],
+            (fixture_dict['home_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
         )
         players_df.loc[players_df['team'] == away_team, 'xPts(fplAdv)'] += golden_sum(
-            players_df['med_pts/fixture'],
-            players_df['med_pts/fixture'],
-            (fixture_dict['away_fplAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+            players_df['med_pts/fxtr'],
+            players_df['med_pts/fxtr'],
+            (fixture_dict['away_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
         )
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         def_teamsAdv_dict[home_team] = def_teamsAdv_dict.get(home_team, 0) + fixture_dict['home_defAdv']
         def_teamsAdv_dict[away_team] = def_teamsAdv_dict.get(away_team, 0) + fixture_dict['away_defAdv']
 
         players_df.loc[((players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')) & (players_df['team'] == home_team), 'xPts(defAdv)'] += golden_sum(
-            players_df['med_pts/fixture'],
-            players_df['med_pts/fixture'],
-            (fixture_dict['home_defAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+            players_df['med_pts/fxtr'],
+            players_df['med_pts/fxtr'],
+            (fixture_dict['home_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
         )
         players_df.loc[((players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')) & (players_df['team'] == away_team), 'xPts(defAdv)'] += golden_sum(
-            players_df['med_pts/fixture'],
-            players_df['med_pts/fixture'],
-            (fixture_dict['away_defAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+            players_df['med_pts/fxtr'],
+            players_df['med_pts/fxtr'],
+            (fixture_dict['away_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
         )
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         att_teamsAdv_dict[home_team] = att_teamsAdv_dict.get(home_team, 0) + fixture_dict['home_attAdv']
         att_teamsAdv_dict[away_team] = att_teamsAdv_dict.get(away_team, 0) + fixture_dict['away_attAdv']
 
         players_df.loc[((players_df['position'] == 'MID') | (players_df['position'] == 'FWD')) & (players_df['team'] == home_team), 'xPts(attAdv)'] += golden_sum(
-            players_df['med_pts/fixture'],
-            players_df['med_pts/fixture'],
-            (fixture_dict['home_attAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+            players_df['med_pts/fxtr'],
+            players_df['med_pts/fxtr'],
+            (fixture_dict['home_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
         )
         players_df.loc[((players_df['position'] == 'MID') | (players_df['position'] == 'FWD')) & (players_df['team'] == away_team), 'xPts(attAdv)'] += golden_sum(
-            players_df['med_pts/fixture'],
-            players_df['med_pts/fixture'],
-            (fixture_dict['away_attAdv'] / 9) * players_df['MedAbsDev(pts/fixture)']
+            players_df['med_pts/fxtr'],
+            players_df['med_pts/fxtr'],
+            (fixture_dict['away_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
         )
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
@@ -612,10 +616,10 @@ print("\n\n\n")
 teams_top_fpl_players_dict = {}
 teams_top_fpl_players_df = pd.DataFrame()
 for team in fpl_teams_stats_df.index:
-    team_top_fpl_players = players_df.loc[players_df['team'] == team, ['position','team','web_name','tot_pts','fplAdv_nxtGWs','med_pts/fixture','xPts(fplAdv)']].head(7).sort_values(['xPts(fplAdv)','med_pts/fixture','tot_pts'], ascending=[False,False,False]).head(5)   # prime nbers: 11 (max # of players from the same team in a real match) ==> [7 ==> 5] ==> 3 (max # of players from the same team in an fpl game)
+    team_top_fpl_players = players_df.loc[players_df['team'] == team, ['position','team','web_name','tot_pts','fplAdv_nxtGWs','med_pts/fxtr','xPts(fplAdv)']].head(7).sort_values(['xPts(fplAdv)','med_pts/fxtr','tot_pts'], ascending=[False,False,False]).head(5)   # prime nbers: 11 (max # of players from the same team in a real match) ==> [7 ==> 5] ==> 3 (max # of players from the same team in an fpl game)
     team_top_fpl_players = team_top_fpl_players.round(3)
     teams_top_fpl_players_df = pd.concat([teams_top_fpl_players_df, team_top_fpl_players])
-    team_top_fpl_players = [' ==> '.join(i) for i in zip(team_top_fpl_players['web_name'], '(' + team_top_fpl_players['med_pts/fixture'].map(str) + ', ' + team_top_fpl_players['xPts(fplAdv)'].map(str) + ')')]
+    team_top_fpl_players = [' ==> '.join(i) for i in zip(team_top_fpl_players['web_name'], '(' + team_top_fpl_players['med_pts/fxtr'].map(str) + ', ' + team_top_fpl_players['xPts(fplAdv)'].map(str) + ')')]
     teams_top_fpl_players_dict[team] = team_top_fpl_players
 fpl_matrix_df = pd.DataFrame(teams_top_fpl_players_dict).transpose()
 fpl_matrix_df.index.name = 'team'
@@ -630,10 +634,10 @@ teams_top_defensive_players_dict = {}
 teams_top_defensive_players_df = pd.DataFrame() 
 defensive_players = players_df[(players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')] # gkps and defs
 for team in def_teams_stats_df.index:
-    team_top_defensive_players = defensive_players.loc[players_df['team'] == team, ['position','team','web_name','tot_pts','defAdv_nxtGWs','med_pts/fixture','xPts(defAdv)']].head(5).sort_values(['xPts(defAdv)','med_pts/fixture','tot_pts'], ascending=[False,False,False])   # 5 ≈ 11/2  ###> head(3) is commented coz sometimes a top-3 player is injured (& you need a reserve to fill-in)
+    team_top_defensive_players = defensive_players.loc[players_df['team'] == team, ['position','team','web_name','tot_pts','defAdv_nxtGWs','med_pts/fxtr','xPts(defAdv)']].head(5).sort_values(['xPts(defAdv)','med_pts/fxtr','tot_pts'], ascending=[False,False,False])   # 5 ≈ 11/2  ###> head(3) is commented coz sometimes a top-3 player is injured (& you need a reserve to fill-in)
     team_top_defensive_players = team_top_defensive_players.round(3)
     teams_top_defensive_players_df = pd.concat([teams_top_defensive_players_df, team_top_defensive_players])
-    team_top_defensive_players = [' ==> '.join(i) for i in zip(team_top_defensive_players['web_name'], '(' + team_top_defensive_players['med_pts/fixture'].map(str) + ', ' + team_top_defensive_players['xPts(defAdv)'].map(str) + ')')]
+    team_top_defensive_players = [' ==> '.join(i) for i in zip(team_top_defensive_players['web_name'], '(' + team_top_defensive_players['med_pts/fxtr'].map(str) + ', ' + team_top_defensive_players['xPts(defAdv)'].map(str) + ')')]
     teams_top_defensive_players_dict[team] = team_top_defensive_players
 defensive_matrix_df = pd.DataFrame(teams_top_defensive_players_dict).transpose()
 defensive_matrix_df.index.name = 'team'
@@ -648,10 +652,10 @@ teams_top_attacking_players_dict = {}
 teams_top_attacking_players_df = pd.DataFrame() 
 attacking_players = players_df[(players_df['position'] == 'MID') | (players_df['position'] == 'FWD')] # mids and fwds
 for team in att_teams_stats_df.index:
-    team_top_attacking_players = attacking_players.loc[players_df['team'] == team, ['position','team','web_name','tot_pts','attAdv_nxtGWs','med_pts/fixture','xPts(attAdv)']].head(5).sort_values(['xPts(attAdv)','med_pts/fixture','tot_pts'], ascending=[False,False,False])   # 5 ≈ 11/2 ###> head(3) is commented coz sometimes a top 3-player is injured (& you need a reserve to fill-in)
+    team_top_attacking_players = attacking_players.loc[players_df['team'] == team, ['position','team','web_name','tot_pts','attAdv_nxtGWs','med_pts/fxtr','xPts(attAdv)']].head(5).sort_values(['xPts(attAdv)','med_pts/fxtr','tot_pts'], ascending=[False,False,False])   # 5 ≈ 11/2 ###> head(3) is commented coz sometimes a top 3-player is injured (& you need a reserve to fill-in)
     team_top_attacking_players = team_top_attacking_players.round(3)
     teams_top_attacking_players_df = pd.concat([teams_top_attacking_players_df, team_top_attacking_players])
-    team_top_attacking_players = [' ==> '.join(i) for i in zip(team_top_attacking_players['web_name'], '(' + team_top_attacking_players['med_pts/fixture'].map(str) + ', ' + team_top_attacking_players['xPts(attAdv)'].map(str) + ')')]
+    team_top_attacking_players = [' ==> '.join(i) for i in zip(team_top_attacking_players['web_name'], '(' + team_top_attacking_players['med_pts/fxtr'].map(str) + ', ' + team_top_attacking_players['xPts(attAdv)'].map(str) + ')')]
     teams_top_attacking_players_dict[team] = team_top_attacking_players
 attacking_matrix_df = pd.DataFrame(teams_top_attacking_players_dict).transpose()
 attacking_matrix_df.index.name = 'team'
@@ -670,12 +674,12 @@ teams_top_players_df = pd.DataFrame()
 for team in decision_matrix_df.index:
     nberOfTeamTopAttPlayers = decision_matrix_df.at[team, '#atts']
     nberOfTeamTopDefPlayers = decision_matrix_df.at[team, '#defs']
-    team_top_attacking_players = attacking_players.loc[players_df['team'] == team, ['position','team','web_name','tot_pts','med_pts/fixture','xPts(avgAdv)']].head(5).sort_values(['xPts(avgAdv)','med_pts/fixture','tot_pts'], ascending=[False,False,False]).head(nberOfTeamTopAttPlayers)
-    team_top_defensive_players = defensive_players.loc[players_df['team'] == team, ['position','team','web_name','tot_pts','med_pts/fixture','xPts(avgAdv)']].head(5).sort_values(['xPts(avgAdv)','med_pts/fixture','tot_pts'], ascending=[False,False,False]).head(nberOfTeamTopDefPlayers)
-    team_top_players_for_nxtGWs = pd.concat([team_top_attacking_players, team_top_defensive_players]).sort_values(['xPts(avgAdv)', 'med_pts/fixture','tot_pts'], ascending=[False,False,False])
+    team_top_attacking_players = attacking_players.loc[players_df['team'] == team, ['position','team','web_name','tot_pts','med_pts/fxtr','xPts(avgAdv)']].head(5).sort_values(['xPts(avgAdv)','med_pts/fxtr','tot_pts'], ascending=[False,False,False]).head(nberOfTeamTopAttPlayers)
+    team_top_defensive_players = defensive_players.loc[players_df['team'] == team, ['position','team','web_name','tot_pts','med_pts/fxtr','xPts(avgAdv)']].head(5).sort_values(['xPts(avgAdv)','med_pts/fxtr','tot_pts'], ascending=[False,False,False]).head(nberOfTeamTopDefPlayers)
+    team_top_players_for_nxtGWs = pd.concat([team_top_attacking_players, team_top_defensive_players]).sort_values(['xPts(avgAdv)', 'med_pts/fxtr','tot_pts'], ascending=[False,False,False])
     team_top_players_for_nxtGWs = team_top_players_for_nxtGWs.round(5)
     teams_top_players_df = pd.concat([teams_top_players_df, team_top_players_for_nxtGWs])
-    team_top_players_for_nxtGWs = [' ==> '.join(i) for i in zip(team_top_players_for_nxtGWs['web_name'], '(' + team_top_players_for_nxtGWs['med_pts/fixture'].map(str) + ', ' + team_top_players_for_nxtGWs['xPts(avgAdv)'].map(str) + ')')]
+    team_top_players_for_nxtGWs = [' ==> '.join(i) for i in zip(team_top_players_for_nxtGWs['web_name'], '(' + team_top_players_for_nxtGWs['med_pts/fxtr'].map(str) + ', ' + team_top_players_for_nxtGWs['xPts(avgAdv)'].map(str) + ')')]
     teams_top_players_for_nxtGWs_dict[team] = team_top_players_for_nxtGWs
 teams_top_players_for_nxtGWs_df = pd.DataFrame(teams_top_players_for_nxtGWs_dict).transpose()
 teams_top_players_for_nxtGWs_df.columns = ['Player1', 'Player2','Player3']
