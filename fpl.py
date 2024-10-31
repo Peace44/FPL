@@ -216,18 +216,20 @@ for player in players:
 
 
 ######################################################################################################################################################################################################################################################################################################################################
-players_fixturesPlayedPts_dict = {}
+players_fixturesPts_dict = {}
 for gw in range(1, refGW): ### fetch per-gameweek data for all players
     response = requests.get(gameweeks_info_url.format(gw))
     gwData = response.json()
     elements = gwData['elements']
     for element in elements:
         player_id = element['id']
-        if player_id not in players_fixturesPlayedPts_dict:
-            players_fixturesPlayedPts_dict[player_id] = []
+        if player_id not in players_fixturesPts_dict:
+            players_fixturesPts_dict[player_id] = [[],[]]
         player_team = teams_dict[players_dict[player_id]['team']]
         gwMinutes = element['stats']['minutes']
-        if gwMinutes > 0:
+        if gwMinutes == 0:
+            players_fixturesPts_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesPts_dict[player_id][1].append(None)
+        else:
             gwFixtures = element['explain']
             for gwFixture in gwFixtures: ### sometimes we have 2ble gameweeks!
                 fixture_id = gwFixture['fixture']
@@ -235,26 +237,14 @@ for gw in range(1, refGW): ### fetch per-gameweek data for all players
                 fixture_pts = sum(fixture_stat['points'] for fixture_stat in fixture_stats)
                 fixture_minutes = fixture_stats[0]['value'] if fixture_stats[0]['identifier'] == 'minutes' else None
                 if fixture_minutes > 0: ### if the player actually played in that fixture        
-                    players_fixturesPlayedPts_dict[player_id].append(fixture_pts)
+                    players_fixturesPts_dict[player_id][0].append(fixture_pts) if gw < form_refGW else players_fixturesPts_dict[player_id][1].append(fixture_pts)
                 else:
-                    print(f"Player {player_id} with {fixture_stats[0]['value']} {fixture_stats[0]['identifier']} in fixture {gwFixture['fixture']}.")
+                    players_fixturesPts_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesPts_dict[player_id][1].append(None)
                 if fixture_id in teams_fixturesPts_dict[player_team][gw-1]:
                     teams_fixturesPts_dict[player_team][gw-1][fixture_id] += fixture_pts
 
-players_formFixturesPts_dict = {}
-for gw in range(form_refGW, refGW):
-    response = requests.get(gameweeks_info_url.format(gw))
-    gwData = response.json()
-    elements = gwData['elements']
-    for element in elements:
-        player_id = element['id']
-        if player_id not in players_formFixturesPts_dict:
-            players_formFixturesPts_dict[player_id] = []
-        gwFixtures = element['explain']
-        for gwFixture in gwFixtures: ### sometimes we have 2ble gameweeks!
-            fixture_stats = gwFixture['stats']
-            fixture_pts = sum(fixture_stat['points'] for fixture_stat in fixture_stats)
-            players_formFixturesPts_dict[player_id].append(fixture_pts)
+players_fixturesPlayedPts_dict = {player_id: [pts for pts in (fixturesPts[0] + fixturesPts[1]) if pts is not None] for player_id, fixturesPts in players_fixturesPts_dict.items()}
+players_formFixturesPts_dict = {player_id: [0 if pts is None else pts for pts in fixturesPts[1]] for player_id, fixturesPts in players_fixturesPts_dict.items()}
 
 for player_dict in players_stats:
     player_id = player_dict['id']
@@ -302,11 +292,21 @@ teams_fixturesPts_dict = {
     team: [list(dictionary.values()) for dictionary in array_of_dictionaries] for team, array_of_dictionaries in teams_fixturesPts_dict.items()
 }
 teams_fixturesPts_dict = {
-    team: [item for sublist in list_of_lists for item in sublist] for team, list_of_lists in teams_fixturesPts_dict.items()
+    team: [[item for sublist in list_of_lists[0:form_refGW-1] for item in sublist], [item for sublist in list_of_lists[form_refGW-1:] for item in sublist]] for team, list_of_lists in teams_fixturesPts_dict.items()
 }
+teams_formFixturesPts_dict = {team: team_pts[1] for team, team_pts in teams_fixturesPts_dict.items()}
+teams_fixturesPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesPts_dict.items()}
 
 # print("\n\n\n")
+# print(players_fixturesPts_dict)
+# print("\n\n\n")
+# print(players_fixturesPlayedPts_dict)
+# print("\n\n\n")
+# print(players_formFixturesPts_dict)
+# print("\n\n\n")
 # print(teams_fixturesPts_dict)
+# print("\n\n\n")
+# print(teams_formFixturesPts_dict)
 # print("\n\n\n")
 # print(players_df.loc[(players_df['team'] == 'MCI')].head(37).to_string(index=False))
 # print("\n\n\n")
@@ -367,6 +367,7 @@ fpl_teams_stats_df.insert(0, 'fpl_rank', 1 + fpl_teams_stats_df['team'].index)
 fpl_teams_stats_df.insert(1, 'fpl_tier', 1 + fpl_teams_stats_df['team'].index//2)
 fpl_teams_stats_df = fpl_teams_stats_df.set_index('team', drop=False)
 
+# print("\n\n\n")
 # print(fpl_teams_stats_df)
 # print("\n\n\n")
 #####################################################################################################################################################################################################################################################################################################################################
