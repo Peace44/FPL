@@ -322,8 +322,9 @@ teams_tot_pts_dict = {team: sum(pts) for team, pts in teams_fixturesPts_dict.ite
 
 
 ######################################################################################################################################################################################################################################################################################################################################
-fpl_teams_stats_df = players_df.groupby('team').sum(numeric_only=True).reset_index().drop(columns=['id', 'avg_pts/fxtr'], axis='columns').rename(columns={'tot_pts':'fpl_pts','avg_form':'fpl_form'})
+fpl_teams_stats_df = players_df.groupby('team').sum(numeric_only=True).reset_index().drop(columns=['id','tot_pts','fxtrs_plyd','fxtrs_not_plyd','avg_pts/fxtr'], axis='columns').rename(columns={'avg_form':'fpl_form'})
 fpl_teams_stats_df.insert(1, 'matches_played', fpl_teams_stats_df['team'].map(matches_played_dict))
+fpl_teams_stats_df.insert(2, 'fpl_pts', fpl_teams_stats_df['team'].map(teams_tot_pts_dict))
 fpl_teams_stats_df.insert(3, 'fpl_pts/match', round(fpl_teams_stats_df['fpl_pts'] / fpl_teams_stats_df['matches_played'], 11))
 fpl_teams_stats_df['fpl_xPts'] = golden_sum(fpl_teams_stats_df['fpl_pts/match'], fpl_teams_stats_df['fpl_form'])
 fpl_teams_stats_df['Z(fpl_xPts)'] = Z(fpl_teams_stats_df['fpl_xPts']) ### Z-score of fpl_xPts
