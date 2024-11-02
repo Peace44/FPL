@@ -296,6 +296,7 @@ teams_fixturesPts_dict = {
 }
 teams_formFixturesPts_dict = {team: team_pts[1] for team, team_pts in teams_fixturesPts_dict.items()}
 teams_fixturesPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesPts_dict.items()}
+teams_tot_pts_dict = {team: sum(pts) for team, pts in teams_fixturesPts_dict.items()}
 
 # print("\n\n\n")
 # print(players_fixturesPts_dict)
