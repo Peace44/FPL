@@ -170,7 +170,7 @@ def golden_sum(gold, silver=None, bronze=None, symmetric=False):
     if silver is None:
         return gold
     elif bronze is None:
-        return round(PHI*gold + (1-PHI)*silver, 11)
+        return PHI*gold + (1-PHI)*silver
     else:
         if symmetric:
             return golden_sum(golden_sum(gold, bronze), silver) # This is equivalent to returning ~(.382*gold + .236*bronze + .382*silver)~ which is symmetric! The philosophy here is that the 1st parameter should be goldy (gold or a gold alloy) and the 2nd parameter not goldy!
@@ -431,51 +431,74 @@ for fixture in fixtures_data: # for fixture in upcoming_fixtures_data
         fixture_dict['away_attAdv'] = -fixture_dict['home_defAdv']
         
         nxtGWs_fixtures.append(fixture_dict)
-
+        #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         fpl_teamsAdv_dict[home_team] = fpl_teamsAdv_dict.get(home_team, 0) + fixture_dict['home_fplAdv']
         fpl_teamsAdv_dict[away_team] = fpl_teamsAdv_dict.get(away_team, 0) + fixture_dict['away_fplAdv']
-
-        players_df.loc[players_df['team'] == home_team, 'xPts(fplAdv)'] += golden_sum(
-            players_df['med_pts/fxtr'],
-            players_df['med_pts/fxtr'],
-            (fixture_dict['home_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        )
-        players_df.loc[players_df['team'] == away_team, 'xPts(fplAdv)'] += golden_sum(
-            players_df['med_pts/fxtr'],
-            players_df['med_pts/fxtr'],
-            (fixture_dict['away_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        )
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         def_teamsAdv_dict[home_team] = def_teamsAdv_dict.get(home_team, 0) + fixture_dict['home_defAdv']
         def_teamsAdv_dict[away_team] = def_teamsAdv_dict.get(away_team, 0) + fixture_dict['away_defAdv']
-
-        players_df.loc[((players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')) & (players_df['team'] == home_team), 'xPts(defAdv)'] += golden_sum(
-            players_df['med_pts/fxtr'],
-            players_df['med_pts/fxtr'],
-            (fixture_dict['home_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        )
-        players_df.loc[((players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')) & (players_df['team'] == away_team), 'xPts(defAdv)'] += golden_sum(
-            players_df['med_pts/fxtr'],
-            players_df['med_pts/fxtr'],
-            (fixture_dict['away_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        )
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         att_teamsAdv_dict[home_team] = att_teamsAdv_dict.get(home_team, 0) + fixture_dict['home_attAdv']
         att_teamsAdv_dict[away_team] = att_teamsAdv_dict.get(away_team, 0) + fixture_dict['away_attAdv']
-
-        players_df.loc[((players_df['position'] == 'MID') | (players_df['position'] == 'FWD')) & (players_df['team'] == home_team), 'xPts(attAdv)'] += golden_sum(
-            players_df['med_pts/fxtr'],
-            players_df['med_pts/fxtr'],
-            (fixture_dict['home_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+        #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+        fplHomeAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr']
+        fplAwayAdv_playerGoldenSum_xPtsParam1 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        defHomeAdv_playerGoldenSum_xPtsParam1 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        defAwayAdv_playerGoldenSum_xPtsParam1 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        attHomeAdv_playerGoldenSum_xPtsParam1 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        attAwayAdv_playerGoldenSum_xPtsParam1 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+        fplHomeAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        fplAwayAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        defHomeAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        defAwayAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        attHomeAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        attAwayAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+        fplHomeAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['home_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        fplAwayAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['away_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        defHomeAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['home_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        defAwayAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['away_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        attHomeAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['home_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        attAwayAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['away_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+        #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+        players_df.loc[players_df['team'] == home_team, 'xPts(fplAdv)'] += golden_sum(
+            fplHomeAdv_playerGoldenSum_xPtsParam1,
+            fplHomeAdv_playerGoldenSum_xPtsParam2,
+            fplHomeAdv_playerGoldenSum_xPtsParam3,
         )
-        players_df.loc[((players_df['position'] == 'MID') | (players_df['position'] == 'FWD')) & (players_df['team'] == away_team), 'xPts(attAdv)'] += golden_sum(
-            players_df['med_pts/fxtr'],
-            players_df['med_pts/fxtr'],
-            (fixture_dict['away_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        players_df.loc[players_df['team'] == away_team, 'xPts(fplAdv)'] += golden_sum(
+            fplAwayAdv_playerGoldenSum_xPtsParam1,
+            fplAwayAdv_playerGoldenSum_xPtsParam2,
+            fplAwayAdv_playerGoldenSum_xPtsParam3,
         )
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-
+        players_df.loc[((players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')) & (players_df['team'] == home_team), 'xPts(defAdv)'] += golden_sum(
+            defHomeAdv_playerGoldenSum_xPtsParam1,
+            defHomeAdv_playerGoldenSum_xPtsParam2,
+            defHomeAdv_playerGoldenSum_xPtsParam3,
+        )
+        players_df.loc[((players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')) & (players_df['team'] == away_team), 'xPts(defAdv)'] += golden_sum(
+            defAwayAdv_playerGoldenSum_xPtsParam1,
+            defAwayAdv_playerGoldenSum_xPtsParam2,
+            defAwayAdv_playerGoldenSum_xPtsParam3,
+        )
+        #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+        players_df.loc[((players_df['position'] == 'MID') | (players_df['position'] == 'FWD')) & (players_df['team'] == home_team), 'xPts(attAdv)'] += golden_sum(
+            attHomeAdv_playerGoldenSum_xPtsParam1,
+            attHomeAdv_playerGoldenSum_xPtsParam2,
+            attHomeAdv_playerGoldenSum_xPtsParam3,
+        )
+        players_df.loc[((players_df['position'] == 'MID') | (players_df['position'] == 'FWD')) & (players_df['team'] == away_team), 'xPts(attAdv)'] += golden_sum(
+            attAwayAdv_playerGoldenSum_xPtsParam1,
+            attAwayAdv_playerGoldenSum_xPtsParam2,
+            attAwayAdv_playerGoldenSum_xPtsParam3,
+        )
+        #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+        #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         teams_nxtGWsNberOfMatches_dict[home_team] = teams_nxtGWsNberOfMatches_dict.get(home_team, 0) + 1
         teams_nxtGWsNberOfMatches_dict[away_team] = teams_nxtGWsNberOfMatches_dict.get(away_team, 0) + 1
 
@@ -487,7 +510,7 @@ players_df['xPts(avgAdv)'] = round((players_df['xPts(fplAdv)'] + players_df['xPt
 
 
 fpl_teams_stats_df = fpl_teams_stats_df[['fpl_rank', 'fpl_tier', 'team', 'fpl_xPts', 'avg_GD/match', 'fpl_potential']] ###> comment this line to make fpl_teams_stats_df more detailed!
-
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 fpl_teams_stats_df['fplAdv_nxtGWs'] = fpl_teams_stats_df['team'].map(fpl_teamsAdv_dict)
 fpl_teams_stats_df = fpl_teams_stats_df.sort_values(['fplAdv_nxtGWs','fpl_rank'], ascending=[False,True]).dropna(subset=['fplAdv_nxtGWs'])
@@ -505,6 +528,7 @@ att_teams_stats_df = att_teams_stats_df.sort_values(['attAdv_nxtGWs','att_rank']
 
 players_df['attAdv_nxtGWs'] = players_df['team'].map(att_teamsAdv_dict)
 players_df.loc[((players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')), 'attAdv_nxtGWs'] = 0
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 
 
