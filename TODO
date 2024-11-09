@@ -1,0 +1,32 @@
++ In fpl.py, in order to be able to benchmark/test the quality of different prediction strategies for past/finished gameweeks, I should add an option that only considers relevant data up to that point in time!
++ Thoroughly test (1)
++ Revise the nomenclature of ^fplAdv*xPts, ^defAdv*xPts, ^attAdv*xPts, ^avgAdv*xPts,
++ Add the total references to selected_teams.txt (example: Total ^fplAdv*xPts: 100.27200)
+- While simulating a particular gameweek (refGW) in the future, i should consider data up to the most recent GW, which is nxtGW-1!
+- Teams' stats, just like players' stats, should be based on the med (median) instead of the avg (average = mean) bcoz the med is more reliable/robust than the avg (med is immune to outliers while mean isn't)!!!
+print(teams_fixturesPts_dict) gives:
+{
+    'ARS': [{2: 70}, {11: 68}, {21: 28}, {39: 63}, {47: 36}, {51: 47}, {61: 50}, {71: 15}, {81: 40}], 
+    'AVL': [{7: 47}, {11: 23}, {26: 45}, {31: 42}, {41: 50}, {56: 39}, {62: 54}, {72: 50}, {82: 33}], 
+    'BOU': [{6: 28}, {12: 35}, {24: 49}, {32: 26}, {46: 20}, {52: 53}, {68: 25}, {71: 68}, {82: 35}], 
+    'BRE': [{8: 47}, {16: 20}, {22: 56}, {37: 26}, {49: 31}, {53: 33}, {63: 65}, {75: 31}, {83: 50}], 
+    'BHA': [{3: 74}, {13: 46}, {21: 37}, {33: 46}, {42: 37}, {54: 28}, {64: 42}, {76: 63}, {84: 42}], 
+    'CHE': [{9: 21}, {20: 68}, {23: 30}, {32: 62}, {50: 73}, {54: 56}, {65: 36}, {74: 24}, {85: 42}], 
+    'CRY': [{8: 18}, {14: 17}, {23: 35}, {34: 36}, {43: 51}, {55: 31}, {66: 25}, {77: 24}, {86: 63}], 
+    'EVE': [{3: 16}, {19: 15}, {24: 38}, {31: 34}, {45: 33}, {55: 43}, {67: 53}, {73: 66}, {87: 35}], 
+    'FUL': [{1: 27}, {15: 47}, {25: 36}, {35: 40}, {44: 48}, {59: 61}, {69: 39}, {72: 20}, {87: 43}], 
+    'IPS': [{4: 18}, {17: 20}, {25: 35}, {33: 50}, {48: 30}, {56: 37}, {70: 22}, {73: 23}, {83: 36}], 
+    'LEI': [{10: 37}, {15: 29}, {26: 27}, {34: 35}, {45: 32}, {51: 34}, {68: 61}, {78: 39}, {88: 24}], 
+    'LIV': [{4: 69}, {16: 74}, {27: 82}, {36: 22}, {46: 80}, {60: 44}, {66: 64}, {74: 43}, {81: 39}], 
+    'MCI': [{9: 65}, {17: 56}, {30: 49}, {37: 38}, {47: 40}, {58: 35}, {69: 46}, {80: 45}, {89: 62}], 
+    'MUN': [{1: 65}, {13: 28}, {27: 16}, {38: 85}, {43: 54}, {57: 13}, {62: 40}, {75: 45}, {90: 30}], 
+    'NEW': [{5: 58}, {12: 36}, {28: 42}, {40: 43}, {44: 33}, {58: 29}, {67: 52}, {76: 26}, {85: 27}], 
+    'NFO': [{6: 38}, {18: 60}, {29: 34}, {36: 62}, {42: 28}, {59: 22}, {65: 33}, {77: 62}, {88: 47}], 
+    'SOU': [{5: 22}, {18: 26}, {22: 27}, {38: 18}, {48: 35}, {52: 21}, {61: 26}, {78: 38}, {89: 24}], 
+    'TOT': [{10: 37}, {19: 89}, {28: 20}, {39: 21}, {49: 53}, {57: 73}, {64: 37}, {79: 55}, {86: 23}], 
+    'WHU': [{7: 28}, {14: 70}, {30: 22}, {35: 32}, {50: 14}, {53: 33}, {70: 64}, {79: 14}, {90: 39}], 
+    'WOL': [{2: 20}, {20: 24}, {29: 31}, {40: 33}, {41: 23}, {60: 26}, {63: 39}, {80: 27}, {84: 37}]
+}
+for example, ARS pts from GW1 to GW9: 70, 68, 28, 63, 36, etc...
+I need to create another section dedicated to the teams stats if necessary... if not...
+- When calculating players' xPts(fplAdv), xPts(defAdv), xPts(attAdv), and xPts(avgAdv), try to rewrite the code to avoid redundancies! That will also make the code more readable and less prone to errors!!!

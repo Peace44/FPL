@@ -2,6 +2,7 @@ import asyncio
 from aiohttp import ClientSession
 import re
 import pandas as pd
+import math
 
 
 
@@ -61,31 +62,59 @@ if update.lower()[0] == 'y':
     for i in range(len(colsToUpdate)):
         players_df[colsToUpdate[i]] = players_df['id'].map(players_aPts_dicts[i])
 
-    players_df['tot_aPts/tot_xPts'] = round(players_df['tot_aPts']/players_df['tot_xPts'], 8)
+    players_df['tot_aPts-xPts(avgAdv)'] = players_df['tot_aPts'] - players_df['xPts(avgAdv)']
 
-    PHI = 0.61803398874989484820
-    phis = [PHI**2, PHI**1, PHI**0]
-    A, B, C, D, E, F = [1 - phis[2], 1 - phis[1], 1 - phis[0], 1 + phis[0], 1 + phis[1], 1 + phis[2]]
+    PHI = 1.61803398874989484820
+    phis = [PHI**i for i in range(0, 7)]
+    A, B, C, D, E, F, G = phis
 
-    players_df.loc[(players_df['tot_aPts/tot_xPts'] < A), 'nxtGWsPtsTrend'] = 'vvv'
-    players_df.loc[(players_df['tot_aPts/tot_xPts'] >= A) & (players_df['tot_aPts/tot_xPts'] < B), 'nxtGWsPtsTrend'] = 'vv'
-    players_df.loc[(players_df['tot_aPts/tot_xPts'] >= B) & (players_df['tot_aPts/tot_xPts'] < C), 'nxtGWsPtsTrend'] = 'v'
-    players_df.loc[(players_df['tot_aPts/tot_xPts'] >= C) & (players_df['tot_aPts/tot_xPts'] < D), 'nxtGWsPtsTrend'] = '~'
-    players_df.loc[(players_df['tot_aPts/tot_xPts'] >= D) & (players_df['tot_aPts/tot_xPts'] < E), 'nxtGWsPtsTrend'] = '^'
-    players_df.loc[(players_df['tot_aPts/tot_xPts'] >= E) & (players_df['tot_aPts/tot_xPts'] < F), 'nxtGWsPtsTrend'] = '^^'
-    players_df.loc[(players_df['tot_aPts/tot_xPts'] >= F), 'nxtGWsPtsTrend'] = '^^^'
+    players_df.loc[                                                  (players_df['tot_aPts-xPts(avgAdv)'] <  -G), 'nxtGWsPtsTrend'] = '7↓'
+    players_df.loc[(-G <= players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <  -F), 'nxtGWsPtsTrend'] = '6↓'
+    players_df.loc[(-F <= players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <  -E), 'nxtGWsPtsTrend'] = '5↓'
+    players_df.loc[(-E <= players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <  -D), 'nxtGWsPtsTrend'] = '4↓'
+    players_df.loc[(-D <= players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <  -C), 'nxtGWsPtsTrend'] = '3↓'
+    players_df.loc[(-C <= players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <  -B), 'nxtGWsPtsTrend'] = '2↓'
+    players_df.loc[(-B <= players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <  -A), 'nxtGWsPtsTrend'] = '1↓'
+    players_df.loc[(-A <= players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <= +A), 'nxtGWsPtsTrend'] = '~'
+    players_df.loc[(+A <  players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <= +B), 'nxtGWsPtsTrend'] = '1↑'
+    players_df.loc[(+B <  players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <= +C), 'nxtGWsPtsTrend'] = '2↑'
+    players_df.loc[(+C <  players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <= +D), 'nxtGWsPtsTrend'] = '3↑'
+    players_df.loc[(+D <  players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <= +E), 'nxtGWsPtsTrend'] = '4↑'
+    players_df.loc[(+E <  players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <= +F), 'nxtGWsPtsTrend'] = '5↑'
+    players_df.loc[(+F <  players_df['tot_aPts-xPts(avgAdv)']) & (players_df['tot_aPts-xPts(avgAdv)'] <= +G), 'nxtGWsPtsTrend'] = '6↑'
+    players_df.loc[(+G <  players_df['tot_aPts-xPts(avgAdv)'])                                                  , 'nxtGWsPtsTrend'] = '7↑'
 
     players_df.to_csv(fileToUpdate, index=False)
+
     print("\n\n\n")
+    print(f"7↓ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '7↓')].index)} players")
+    print(f"6↓ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '6↓')].index)} players")
+    print(f"5↓ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '5↓')].index)} players")
+    print(f"4↓ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '4↓')].index)} players")
+    print(f"3↓ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '3↓')].index)} players")
+    print(f"2↓ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '2↓')].index)} players")
+    print(f"1↓ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '1↓')].index)} players")
+    print(f" ~ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] ==  '~')].index)} players")
+    print(f"1↑ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '1↑')].index)} players")
+    print(f"2↑ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '2↑')].index)} players")
+    print(f"3↑ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '3↑')].index)} players")
+    print(f"4↑ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '4↑')].index)} players")
+    print(f"5↑ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '5↑')].index)} players")
+    print(f"6↑ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '6↑')].index)} players")
+    print(f"7↑ ==> {len(players_df.loc[(players_df['nxtGWsPtsTrend'] == '7↑')].index)} players")
+    print("\n\n\n")
+    print(f"∑|tot_aPts-xPts(avgAdv)| = {players_df['tot_aPts-xPts(avgAdv)'].abs().sum()}")
+    print("\n\n\n")
+
     print(f"{len(players_aPts_dicts[0])} updates made out of {len(players_df)} total players!!!")
 
 
 # print("\n\n\n")
-# print(players_df.loc[(players_df['team'] == 'MCI')].head(30).to_string(index=False))
+# print(players_df.loc[(players_df['team'] == 'MCI')].head(37).to_string(index=False))
 # print("\n\n\n")
-# print(players_df.loc[(players_df['team'] == 'ARS')].head(30).to_string(index=False))
+# print(players_df.loc[(players_df['team'] == 'ARS')].head(37).to_string(index=False))
 # print("\n\n\n")
-# print(players_df.loc[(players_df['team'] == 'LIV')].head(30).to_string(index=False))
+# print(players_df.loc[(players_df['team'] == 'LIV')].head(37).to_string(index=False))
 # print("\n\n\n")
-# print(players_df.loc[(players_df['team'] == 'SOU')].head(30).to_string(index=False))
+# print(players_df.loc[(players_df['team'] == 'SOU')].head(37).to_string(index=False))
 # print("\n\n\n")
