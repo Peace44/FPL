@@ -408,7 +408,7 @@ fpl_teams_stats_df.insert(1, 'fpl_tier', 1 + fpl_teams_stats_df['team'].index//2
 fpl_teams_stats_df = fpl_teams_stats_df.set_index('team', drop=False)
 
 # print("\n\n\n")
-print(fpl_teams_stats_df) #[['fpl_rank','fpl_tier','team','fpl_med_pts/match','fpl_form','fpl_xPts','med_GD/match','fpl_potential']])
+print(fpl_teams_stats_df[['fpl_rank','fpl_tier','team','fpl_med_pts/match','fpl_form','fpl_xPts','med_GD/match','fpl_potential']])
 # print("\n\n\n")
 #####################################################################################################################################################################################################################################################################################################################################
 
