@@ -10,6 +10,7 @@ import time
 from collections import defaultdict
 from datetime import datetime
 from datetime import timedelta
+import copy
 
 general_info_url = "https://fantasy.premierleague.com/api/bootstrap-static/"
 fixtures_url = "https://fantasy.premierleague.com/api/fixtures/"
@@ -124,6 +125,9 @@ for fixture in fixtures_data:
         teams_fixturesPts_dict[home_team][fixture['event'] - 1][fixture_id] = 0
         teams_fixturesPts_dict[away_team][fixture['event'] - 1][fixture_id] = 0
 
+teams_fixturesDefPts_dict = copy.deepcopy(teams_fixturesPts_dict)
+teams_fixturesAttPts_dict = copy.deepcopy(teams_fixturesPts_dict)
+
 # print('\n\n\n')
 # print(matches_played_dict)
 # print('\n\n\n')
@@ -231,6 +235,7 @@ for gw in range(1, refGW): ### fetch per-gameweek data for all players
         if player_id not in players_fixturesPts_dict:
             players_fixturesPts_dict[player_id] = [[],[]]
         player_team = teams_dict[players_dict[player_id]['team']]
+        player_position = positions_dict[players_dict[player_id]['element_type']]
         gwMinutes = element['stats']['minutes']
         if gwMinutes == 0:
             players_fixturesPts_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesPts_dict[player_id][1].append(None)
@@ -247,6 +252,7 @@ for gw in range(1, refGW): ### fetch per-gameweek data for all players
                     players_fixturesPts_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesPts_dict[player_id][1].append(None)
                 if fixture_id in teams_fixturesPts_dict[player_team][gw-1]:
                     teams_fixturesPts_dict[player_team][gw-1][fixture_id] += fixture_pts
+                    (teams_fixturesDefPts_dict if player_position in ['GKP', 'DEF'] else teams_fixturesAttPts_dict)[player_team][gw-1][fixture_id] += fixture_pts
 
 players_fixturesPlayedPts_dict = {player_id: [pts for pts in (fixturesPts[0] + fixturesPts[1]) if pts is not None] for player_id, fixturesPts in players_fixturesPts_dict.items()}
 players_formFixturesPts_dict = {player_id: [0 if pts is None else pts for pts in fixturesPts[1]] for player_id, fixturesPts in players_fixturesPts_dict.items()}
@@ -261,7 +267,7 @@ for player_dict in players_stats:
     player_formFixturesPts = players_formFixturesPts_dict.get(player_id, [])
     #######################################################################################################################################################################################################################    
     player_dict['med_form'], player_dict['MedAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "median")
-    player_dict['avg_form'], player_dict['MeanAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "mean") ### avg_form is a player's average score per match, calculated from all matches played by his club in the last 30 days.
+    player_dict['form'], player_dict['MeanAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "mean") ### form is a player's average score per match, calculated from all matches played by his club in the last 30 days.
     player_dict['StdDev(form)'] = np.std(player_formFixturesPts) if len(player_formFixturesPts) > 0 else 0
 
     player_dict['med_pts/fxtr'], player_dict['MedAbsDev(pts/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "median")
@@ -278,7 +284,7 @@ players_df = players_df.sort_values([
     'team', 
     'med_form',            'med_pts/fxtr',          'med_pts/fxtr_plyd',
     'MedAbsDev(form)',     'MedAbsDev(pts/fxtr)',   'MedAbsDev(pts/fxtr_plyd)',
-    'avg_form',            'avg_pts/fxtr',          'avg_pts/fxtr_plyd',
+    'form',                'avg_pts/fxtr',          'avg_pts/fxtr_plyd',
     'MeanAbsDev(form)',    'MeanAbsDev(pts/fxtr)',  'MeanAbsDev(pts/fxtr_plyd)',
     'StdDev(form)',        'StdDev(pts/fxtr)',      'StdDev(pts/fxtr_plyd)',
     'tot_pts'
@@ -296,12 +302,30 @@ ascending=[
 teams_fixturesPts_dict = {
     team: [list(dictionary.values()) for dictionary in array_of_dictionaries] for team, array_of_dictionaries in teams_fixturesPts_dict.items()
 }
+teams_fixturesDefPts_dict = {
+    team: [list(dictionary.values()) for dictionary in array_of_dictionaries] for team, array_of_dictionaries in teams_fixturesDefPts_dict.items()
+}
+teams_fixturesAttPts_dict = {
+    team: [list(dictionary.values()) for dictionary in array_of_dictionaries] for team, array_of_dictionaries in teams_fixturesAttPts_dict.items()
+}
+
 teams_fixturesPts_dict = {
     team: [[item for sublist in list_of_lists[0:form_refGW-1] for item in sublist], [item for sublist in list_of_lists[form_refGW-1:] for item in sublist]] for team, list_of_lists in teams_fixturesPts_dict.items()
 }
+teams_fixturesDefPts_dict = {
+    team: [[item for sublist in list_of_lists[0:form_refGW-1] for item in sublist], [item for sublist in list_of_lists[form_refGW-1:] for item in sublist]] for team, list_of_lists in teams_fixturesDefPts_dict.items()
+}
+teams_fixturesAttPts_dict = {
+    team: [[item for sublist in list_of_lists[0:form_refGW-1] for item in sublist], [item for sublist in list_of_lists[form_refGW-1:] for item in sublist]] for team, list_of_lists in teams_fixturesAttPts_dict.items()
+}
+
 teams_formFixturesPts_dict = {team: team_pts[1] for team, team_pts in teams_fixturesPts_dict.items()}
+teams_formFixturesDefPts_dict = {team: team_pts[1] for team, team_pts in teams_fixturesDefPts_dict.items()}
+teams_formFixturesAttPts_dict = {team: team_pts[1] for team, team_pts in teams_fixturesAttPts_dict.items()}
+
 teams_fixturesPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesPts_dict.items()}
-# teams_tot_pts_dict = {team: sum(pts) for team, pts in teams_fixturesPts_dict.items()}
+teams_fixturesDefPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesDefPts_dict.items()}
+teams_fixturesAttPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesAttPts_dict.items()}
 
 # print("\n\n\n")
 # print(players_fixturesPts_dict)
@@ -312,7 +336,15 @@ teams_fixturesPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in 
 # print("\n\n\n")
 # print(teams_fixturesPts_dict)
 # print("\n\n\n")
+# print(teams_fixturesDefPts_dict)
+# print("\n\n\n")
+# print(teams_fixturesAttPts_dict)
+# print("\n\n\n")
 # print(teams_formFixturesPts_dict)
+# print("\n\n\n")
+# print(teams_formFixturesDefPts_dict)
+# print("\n\n\n")
+# print(teams_formFixturesAttPts_dict)
 # print("\n\n\n")
 # print(players_df.loc[(players_df['team'] == 'MCI')].head(37).to_string(index=False))
 # print("\n\n\n")
@@ -327,26 +359,28 @@ teams_fixturesPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in 
 
 
 ######################################################################################################################################################################################################################################################################################################################################
-fpl_teams_stats_df = players_df.groupby('team').sum(numeric_only=True).reset_index().drop(columns=['id','tot_pts','fxtrs_plyd','fxtrs_not_plyd','avg_pts/fxtr'], axis='columns').rename(columns={'avg_form':'fpl_form'})
-fpl_teams_stats_df.insert(1, 'matches_played', fpl_teams_stats_df['team'].map(matches_played_dict))
-fpl_teams_stats_df.insert(2, 'fpl_pts', fpl_teams_stats_df['team'].map(lambda team: np.sum(teams_fixturesPts_dict.get(team, []))))
-fpl_teams_stats_df.insert(3, 'fpl_med_pts/match', fpl_teams_stats_df['team'].map(lambda team: np.median(teams_fixturesPts_dict.get(team, []))))
+# fpl_teams_stats_df = players_df.groupby('team').sum(numeric_only=True).reset_index().drop(columns=['id','tot_pts','fxtrs_plyd','fxtrs_not_plyd','avg_pts/fxtr'], axis='columns').rename(columns={'form':'fpl_form'})
+fpl_teams_stats_df = pd.DataFrame.from_dict(teams_dict, orient='index', columns=['team']).rename_axis('team_id')
+fpl_teams_stats_df['matches_played'] = fpl_teams_stats_df['team'].map(matches_played_dict)
+fpl_teams_stats_df['fpl_pts'] = fpl_teams_stats_df['team'].map(lambda team: np.sum(teams_fixturesPts_dict.get(team, [])))
+fpl_teams_stats_df['fpl_med_pts/match'] = fpl_teams_stats_df['team'].map(lambda team: np.median(teams_fixturesPts_dict.get(team, [])))
+fpl_teams_stats_df['fpl_form'] = fpl_teams_stats_df['team'].map(lambda team: np.mean(teams_formFixturesPts_dict.get(team, [])))
 fpl_teams_stats_df['fpl_xPts'] = golden_sum(fpl_teams_stats_df['fpl_med_pts/match'], fpl_teams_stats_df['fpl_form'])
 fpl_teams_stats_df['Z(fpl_xPts)'] = Z(fpl_teams_stats_df['fpl_xPts']) ### Z-score of fpl_xPts
 
 defensive_players = players_df[(players_df['position'] == 'GKP') | (players_df['position'] == 'DEF')] # gkps and defs
 attacking_players = players_df[(players_df['position'] == 'MID') | (players_df['position'] == 'FWD')] # mids and fwds
 
-fpl_teams_stats_df['def_pts'] = defensive_players.groupby('team').sum(numeric_only=True).reset_index()['tot_pts']
-fpl_teams_stats_df['def_pts/match'] = round(fpl_teams_stats_df['def_pts'] / fpl_teams_stats_df['matches_played'], 11)
-fpl_teams_stats_df['def_form'] = defensive_players.groupby('team').sum(numeric_only=True).reset_index()['avg_form']
-fpl_teams_stats_df['def_xPts'] = golden_sum(fpl_teams_stats_df['def_pts/match'], fpl_teams_stats_df['def_form'])
+fpl_teams_stats_df['def_pts'] = fpl_teams_stats_df['team'].map(lambda team: np.sum(teams_fixturesDefPts_dict.get(team, [])))
+fpl_teams_stats_df['def_med_pts/match'] = fpl_teams_stats_df['team'].map(lambda team: np.median(teams_fixturesDefPts_dict.get(team, [])))
+fpl_teams_stats_df['def_form'] = fpl_teams_stats_df['team'].map(lambda team: np.mean(teams_formFixturesDefPts_dict.get(team, [])))
+fpl_teams_stats_df['def_xPts'] = golden_sum(fpl_teams_stats_df['def_med_pts/match'], fpl_teams_stats_df['def_form'])
 fpl_teams_stats_df['Z(def_xPts)'] = Z(fpl_teams_stats_df['def_xPts']) ### Z-score of def_xPts
 
-fpl_teams_stats_df['att_pts'] = attacking_players.groupby('team').sum(numeric_only=True).reset_index()['tot_pts']
-fpl_teams_stats_df['att_pts/match'] = round(fpl_teams_stats_df['att_pts'] / fpl_teams_stats_df['matches_played'], 11)
-fpl_teams_stats_df['att_form'] = attacking_players.groupby('team').sum(numeric_only=True).reset_index()['avg_form']
-fpl_teams_stats_df['att_xPts'] = golden_sum(fpl_teams_stats_df['att_pts/match'], fpl_teams_stats_df['att_form'])
+fpl_teams_stats_df['att_pts'] = fpl_teams_stats_df['team'].map(lambda team: np.sum(teams_fixturesAttPts_dict.get(team, [])))
+fpl_teams_stats_df['att_med_pts/match'] = fpl_teams_stats_df['team'].map(lambda team: np.median(teams_fixturesAttPts_dict.get(team, [])))
+fpl_teams_stats_df['att_form'] = fpl_teams_stats_df['team'].map(lambda team: np.mean(teams_formFixturesAttPts_dict.get(team, [])))
+fpl_teams_stats_df['att_xPts'] = golden_sum(fpl_teams_stats_df['att_med_pts/match'], fpl_teams_stats_df['att_form'])
 fpl_teams_stats_df['Z(att_xPts)'] = Z(fpl_teams_stats_df['att_xPts']) ### Z-score of att_xPts
 
 fpl_teams_stats_df['goals_for'] = fpl_teams_stats_df['team'].map(lambda team: np.sum(goals_for_dict.get(team, [])))
@@ -362,20 +396,20 @@ fpl_teams_stats_df['med_GD/match'] = fpl_teams_stats_df['team'].map(lambda team:
 fpl_teams_stats_df['Z(med_GD/match)'] = Z(fpl_teams_stats_df['med_GD/match']) ### Z-score of med_GD/match
 
 fpl_teams_stats_df['clean_sheets'] = fpl_teams_stats_df['team'].map(clean_sheets_dict)
-fpl_teams_stats_df['avg_CS/match'] = round(fpl_teams_stats_df['clean_sheets'] / fpl_teams_stats_df['matches_played'], 11)
+fpl_teams_stats_df['CS/match'] = round(fpl_teams_stats_df['clean_sheets'] / fpl_teams_stats_df['matches_played'], 11)
 
 fpl_teams_stats_df['att_potential'] = golden_sum(fpl_teams_stats_df['Z(att_xPts)'], +fpl_teams_stats_df['Z(med_GF/match)'])
 fpl_teams_stats_df['def_potential'] = golden_sum(fpl_teams_stats_df['Z(def_xPts)'], -fpl_teams_stats_df['Z(med_GA/match)'])
 fpl_teams_stats_df['fpl_potential'] = golden_sum(fpl_teams_stats_df['Z(fpl_xPts)'], +fpl_teams_stats_df['Z(med_GD/match)'])
 
-fpl_teams_stats_df = fpl_teams_stats_df.sort_values(['fpl_potential','fpl_xPts','fpl_med_pts/match','fpl_pts','avg_CS/match'], ascending=[False,False,False,False,False]).reset_index(drop=True) ### THIS SORTING IS IN-ORDER & EXHAUSTIVE!
+fpl_teams_stats_df = fpl_teams_stats_df.sort_values(['fpl_potential','fpl_xPts','fpl_med_pts/match','fpl_pts','CS/match'], ascending=[False,False,False,False,False]).reset_index(drop=True) ### THIS SORTING IS IN-ORDER & EXHAUSTIVE!
 
 fpl_teams_stats_df.insert(0, 'fpl_rank', 1 + fpl_teams_stats_df['team'].index)
 fpl_teams_stats_df.insert(1, 'fpl_tier', 1 + fpl_teams_stats_df['team'].index//2)
 fpl_teams_stats_df = fpl_teams_stats_df.set_index('team', drop=False)
 
 # print("\n\n\n")
-# print(fpl_teams_stats_df)
+# print(fpl_teams_stats_df[['fpl_rank','fpl_tier','team','fpl_med_pts/match','fpl_form','fpl_xPts','med_GD/match','fpl_potential']])
 # print("\n\n\n")
 #####################################################################################################################################################################################################################################################################################################################################
 
@@ -448,26 +482,26 @@ for fixture in fixtures_data: # for fixture in upcoming_fixtures_data
         att_teamsAdv_dict[away_team] = att_teamsAdv_dict.get(away_team, 0) + fixture_dict['away_attAdv']
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-        fplHomeAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr']
-        fplAwayAdv_playerGoldenSum_xPtsParam1 = fplHomeAdv_playerGoldenSum_xPtsParam1
-        defHomeAdv_playerGoldenSum_xPtsParam1 = fplHomeAdv_playerGoldenSum_xPtsParam1
-        defAwayAdv_playerGoldenSum_xPtsParam1 = fplHomeAdv_playerGoldenSum_xPtsParam1
-        attHomeAdv_playerGoldenSum_xPtsParam1 = fplHomeAdv_playerGoldenSum_xPtsParam1
-        attAwayAdv_playerGoldenSum_xPtsParam1 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        fplHomeAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['home_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        fplAwayAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['away_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        defHomeAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['home_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        defAwayAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['away_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        attHomeAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['home_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        attAwayAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['away_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-        fplHomeAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
-        fplAwayAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
-        defHomeAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
-        defAwayAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
-        attHomeAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
-        attAwayAdv_playerGoldenSum_xPtsParam2 = fplHomeAdv_playerGoldenSum_xPtsParam1
+        fplHomeAdv_playerGoldenSum_xPtsParam2 = None
+        fplAwayAdv_playerGoldenSum_xPtsParam2 = None
+        defHomeAdv_playerGoldenSum_xPtsParam2 = None
+        defAwayAdv_playerGoldenSum_xPtsParam2 = None
+        attHomeAdv_playerGoldenSum_xPtsParam2 = None
+        attAwayAdv_playerGoldenSum_xPtsParam2 = None
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-        fplHomeAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['home_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        fplAwayAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['away_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        defHomeAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['home_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        defAwayAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['away_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        attHomeAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['home_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        attAwayAdv_playerGoldenSum_xPtsParam3 = (fixture_dict['away_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        fplHomeAdv_playerGoldenSum_xPtsParam3 = None
+        fplAwayAdv_playerGoldenSum_xPtsParam3 = None
+        defHomeAdv_playerGoldenSum_xPtsParam3 = None
+        defAwayAdv_playerGoldenSum_xPtsParam3 = None
+        attHomeAdv_playerGoldenSum_xPtsParam3 = None
+        attAwayAdv_playerGoldenSum_xPtsParam3 = None
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         players_df.loc[players_df['team'] == home_team, 'xPts(fplAdv)'] += golden_sum(
