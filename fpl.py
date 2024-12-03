@@ -411,8 +411,6 @@ teams_stats_df['fpl_potential'] = golden_sum(teams_stats_df['Z(fpl_xPts)'], +tea
 
 teams_stats_df = teams_stats_df.sort_values(['fpl_potential','fpl_xPts','fpl_avg_pts/match','fpl_pts','avg_CS/match'], ascending=[False,False,False,False,False]).reset_index(drop=True).set_index('team', drop=False) ### THIS SORTING IS IN-ORDER & EXHAUSTIVE!
 
-
-
 fpl_cols = ['matches_played','fpl_pts','fpl_med_pts/match','fpl_avg_pts/match','fpl_med_form','fpl_avg_form','fpl_xPts','Z(fpl_xPts)','goal_diff','med_GD/match','avg_GD/match','Z(avg_GD/match)','clean_sheets','avg_CS/match','fpl_potential']
 def_cols = ['matches_played','def_pts','def_med_pts/match','def_avg_pts/match','def_med_form','def_avg_form','def_xPts','Z(def_xPts)','goals_against','med_GA/match','avg_GA/match','Z(avg_GA/match)','clean_sheets','avg_CS/match','def_potential']
 att_cols = ['matches_played','att_pts','def_med_pts/match','def_avg_pts/match','att_med_form','att_avg_form','att_xPts','Z(att_xPts)','goals_for','med_GF/match','avg_GF/match','Z(avg_GF/match)','clean_sheets','avg_CS/match','att_potential']
@@ -424,7 +422,6 @@ print(teams_stats_df[def_cols])
 print("\n\n\n")
 print(teams_stats_df[att_cols])
 print("\n\n\n")
-input()
 #####################################################################################################################################################################################################################################################################################################################################
 
 
@@ -435,29 +432,26 @@ fpl_teams_stats_df = fpl_df.sort_values(['fpl_potential','fpl_xPts'], ascending=
 fpl_teams_stats_df.insert(0, 'fpl_rank', 1 + fpl_teams_stats_df['team'].index)
 fpl_teams_stats_df.insert(1, 'fpl_tier', 1 + fpl_teams_stats_df['team'].index//2)
 fpl_teams_stats_df = fpl_teams_stats_df.set_index('team', drop=False)
-print(fpl_teams_stats_df)
-input()
 
 def_df = teams_stats_df[['def_xPts', 'avg_GA/match', 'def_potential']]
 def_teams_stats_df = def_df.sort_values(['def_potential','def_xPts'], ascending=[False,False]).reset_index(drop=False)
 def_teams_stats_df.insert(0, 'def_rank', 1 + def_teams_stats_df['team'].index)
 def_teams_stats_df.insert(1, 'def_tier', 1 + def_teams_stats_df['team'].index//2)
 def_teams_stats_df = def_teams_stats_df.set_index('team', drop=False)
-print(def_teams_stats_df)
-input()
 
 att_df = teams_stats_df[['att_xPts', 'avg_GF/match', 'att_potential']]
 att_teams_stats_df = att_df.sort_values(['att_potential','att_xPts'], ascending=[False,False]).reset_index(drop=False)
 att_teams_stats_df.insert(0, 'att_rank', 1 + att_teams_stats_df['team'].index)
 att_teams_stats_df.insert(1, 'att_tier', 1 + att_teams_stats_df['team'].index//2)
 att_teams_stats_df = att_teams_stats_df.set_index('team', drop=False)
-print(att_teams_stats_df)
-input()
 
-# print(def_teams_stats_df)
-# print("\n\n\n")
-# print(att_teams_stats_df)
-# print("\n\n\n")
+print("\n\n\n")
+print(fpl_teams_stats_df)
+print("\n\n\n")
+print(def_teams_stats_df)
+print("\n\n\n")
+print(att_teams_stats_df)
+print("\n\n\n")
 ######################################################################################################################################################################################################################################################################################################################################
 
 
