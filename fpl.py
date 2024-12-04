@@ -281,22 +281,30 @@ for player_dict in players_stats:
 
 players_df = pd.DataFrame(players_stats).set_index('id', drop=False)
 players_df = players_df.sort_values([
-    'team', 
-    'med_form',            'med_pts/fxtr',          'med_pts/fxtr_plyd',
-    'MedAbsDev(form)',     'MedAbsDev(pts/fxtr)',   'MedAbsDev(pts/fxtr_plyd)',
-    'avg_form',            'avg_pts/fxtr',          'avg_pts/fxtr_plyd',
-    'MeanAbsDev(form)',    'MeanAbsDev(pts/fxtr)',  'MeanAbsDev(pts/fxtr_plyd)',
-    'StdDev(form)',        'StdDev(pts/fxtr)',      'StdDev(pts/fxtr_plyd)',
-    'tot_pts'
+    'team',
+
+    'med_form',                 'avg_form',
+    'med_pts/fxtr',             'avg_pts/fxtr',
+    'med_pts/fxtr_plyd',        'avg_pts/fxtr_plyd',
+
+    'tot_pts', ### I really hope this is the last sorting criteria!!! I wouldn't like the sorting to resort to the criteria below bcoz they might be problematic!!!
+
+    'MedAbsDev(form)',          'MeanAbsDev(form)',             'StdDev(form)',
+    'MedAbsDev(pts/fxtr)',      'MeanAbsDev(pts/fxtr)',         'StdDev(pts/fxtr)',
+    'MedAbsDev(pts/fxtr_plyd)', 'MeanAbsDev(pts/fxtr_plyd)',    'StdDev(pts/fxtr_plyd)',
 ], 
 ascending=[
     True, 
-    False, False, False, 
-    False, False, False, 
-    False, False, False, 
-    False, False, False, 
-    False, False, False, 
-    False
+
+    False, False,
+    False, False,
+    False, False,
+    
+    False,
+    
+    False, False, False,
+    False, False, False,
+    False, False, False,
 ]) # 'x_form' gives you info on which players might be currently <appearing>/<playing well> or not
 
 teams_fixturesPts_dict = {
