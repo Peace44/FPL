@@ -32,3 +32,5 @@ I need to create another section dedicated to the teams stats if necessary... if
 - When calculating players' xPts(fplAdv), xPts(defAdv), xPts(attAdv), and xPts(avgAdv), try to rewrite the code to avoid redundancies! That will also make the code more readable and less prone to errors!!!
 + fpl_pts/match --> fpl_avg_pts/match --> replace it with fpl_med_pts/match
 + Do the above for def_pts/match and att_pts/match
+- I have to review the whole output of fpl.py and see if i need to do some corrections to fpl.py!
+- Review the terminology of vars having _avg_
