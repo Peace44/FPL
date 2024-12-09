@@ -174,8 +174,17 @@ if prvGWsPtsTrendAvailability:
 
 
 ######################################################################################################################################################################################################################################################################################################################################
-def golden_sum(gold, silver=None, bronze=None, symmetric=False):
+def golden_sum(gold, silver=None, bronze=None, symmetric=False, invertArgs=False):
     PHI = 0.61803398874989484820
+
+    if invertArgs:
+        if silver is None:
+            return golden_sum(gold)
+        elif bronze is None:
+            return golden_sum(silver, gold)
+        else:
+            return golden_sum(bronze, silver, gold)
+    
     if silver is None:
         return gold
     elif bronze is None:
@@ -184,6 +193,8 @@ def golden_sum(gold, silver=None, bronze=None, symmetric=False):
         if symmetric:
             return golden_sum(golden_sum(gold, bronze), silver) # This is equivalent to returning ~(.382*gold + .236*bronze + .382*silver)~ which is symmetric! The philosophy here is that the 1st parameter should be goldy (gold or a gold alloy) and the 2nd parameter not goldy!
         return golden_sum(gold, golden_sum(silver, bronze))   ### This is equivalent to returning ~(.618*gold + .236*silver + .146*bronze)~ which is not symmetric! The philosophy here is that the more valuable/important the parameter, the higher its coefficient!
+
+
 
 def calculate_central_tendency_and_deviation(arr, type="mean"):
     if len(arr) == 0:
@@ -198,6 +209,8 @@ def calculate_central_tendency_and_deviation(arr, type="mean"):
         deviations_from_mean = np.abs(arr - mean)
         mean_devs = np.mean(deviations_from_mean)
         return mean, mean_devs
+
+
 
 def Z(series, type="standard"): ### Z-score of series
     if type == 'modified':
@@ -270,8 +283,7 @@ for player_dict in players_stats:
     player_fixturesNotPlayedPts = player_dict['fxtrs_not_plyd'] * [0]
     player_formFixturesPts = players_formFixturesPts_dict.get(player_id, [])
     #######################################################################################################################################################################################################################    
-    player_dict['med_form'], player_dict['MedAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "median")
-    player_dict['avg_form'], player_dict['MeanAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "mean") ### avg_form is a player's average score per match, calculated from all matches played by his club in the last 30 days.
+    player_dict['form'], player_dict['MeanAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "mean") ### form is a player's average score per match, calculated from all matches played by his club in the last 30 days.
     player_dict['StdDev(form)'] = np.std(player_formFixturesPts) if len(player_formFixturesPts) > 0 else 0
 
     player_dict['med_pts/fxtr'], player_dict['MedAbsDev(pts/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "median")
@@ -287,29 +299,29 @@ players_df = pd.DataFrame(players_stats).set_index('id', drop=False)
 players_df = players_df.sort_values([
     'team',
 
-    'med_form',                 'avg_form',
+    'form',
     'med_pts/fxtr',             'avg_pts/fxtr',
     'med_pts/fxtr_plyd',        'avg_pts/fxtr_plyd',
 
     'tot_pts', ### I really hope this is the last sorting criteria!!! I wouldn't like the sorting to resort to the criteria below bcoz they might be problematic!!!
 
-    'MedAbsDev(form)',          'MeanAbsDev(form)',             'StdDev(form)',
+    'MeanAbsDev(form)',                                         'StdDev(form)',
     'MedAbsDev(pts/fxtr)',      'MeanAbsDev(pts/fxtr)',         'StdDev(pts/fxtr)',
     'MedAbsDev(pts/fxtr_plyd)', 'MeanAbsDev(pts/fxtr_plyd)',    'StdDev(pts/fxtr_plyd)',
 ], 
 ascending=[
     True, 
 
-    False, False,
+    False,
     False, False,
     False, False,
     
     False,
     
+    False,        False,
     False, False, False,
     False, False, False,
-    False, False, False,
-]) # 'x_form' gives you info on which players might be currently <appearing>/<playing well> or not
+]) # 'form' gives you info on which players might be currently <appearing>/<playing well> or not
 
 teams_fixturesPts_dict = {
     team: [list(dictionary.values()) for dictionary in array_of_dictionaries] for team, array_of_dictionaries in teams_fixturesPts_dict.items()
@@ -351,13 +363,13 @@ teams_fixturesAttPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts 
 # print(teams_fixturesDefPts_dict)
 # print("\n\n\n")
 # print(teams_fixturesAttPts_dict)
-# print("\n\n\n")
-# print(teams_formFixturesPts_dict)
-# print("\n\n\n")
-# print(teams_formFixturesDefPts_dict)
-# print("\n\n\n")
-# print(teams_formFixturesAttPts_dict)
-# print("\n\n\n")
+print("\n\n\n")
+print(teams_formFixturesPts_dict)
+print("\n\n\n")
+print(teams_formFixturesDefPts_dict)
+print("\n\n\n")
+print(teams_formFixturesAttPts_dict)
+print("\n\n\n")
 # print(players_df.loc[(players_df['team'] == 'MCI')].head(37).to_string(index=False))
 # print("\n\n\n")
 # print(players_df.loc[(players_df['team'] == 'ARS')].head(37).to_string(index=False))
@@ -378,37 +390,34 @@ teams_stats_df['matches_played'] = teams_stats_df['team'].map(matches_played_dic
 teams_stats_df['fpl_tot_pts'] = teams_stats_df['team'].map(lambda team: np.sum(teams_fixturesPts_dict.get(team, [])))
 
 teams_stats_df['fpl_avg_pts/match'] = teams_stats_df['team'].map(lambda team: np.mean(teams_fixturesPts_dict.get(team, [])))
-teams_stats_df['fpl_avg_form'] = teams_stats_df['team'].map(lambda team: np.mean(teams_formFixturesPts_dict.get(team, [])))
-teams_stats_df['fpl_avg_xPts'] = golden_sum(teams_stats_df['fpl_avg_pts/match'], teams_stats_df['fpl_avg_form'])
+teams_stats_df['fpl_form'] = teams_stats_df['team'].map(lambda team: np.mean(teams_formFixturesPts_dict.get(team, [])))
+teams_stats_df['fpl_avg_xPts'] = golden_sum(teams_stats_df['fpl_avg_pts/match'], teams_stats_df['fpl_form'])
 teams_stats_df['Z(fpl_avg_xPts)'] = Z(teams_stats_df['fpl_avg_xPts'], "standard")
 
 teams_stats_df['fpl_med_pts/match'] = teams_stats_df['team'].map(lambda team: np.median(teams_fixturesPts_dict.get(team, [])))
-teams_stats_df['fpl_med_form'] = teams_stats_df['team'].map(lambda team: np.median(teams_formFixturesPts_dict.get(team, [])))
-teams_stats_df['fpl_med_xPts'] = golden_sum(teams_stats_df['fpl_med_pts/match'], teams_stats_df['fpl_med_form'])
+teams_stats_df['fpl_med_xPts'] = golden_sum(teams_stats_df['fpl_med_pts/match'], teams_stats_df['fpl_form'])
 teams_stats_df['Z(fpl_med_xPts)'] = Z(teams_stats_df['fpl_med_xPts'], "modified")
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_stats_df['def_tot_pts'] = teams_stats_df['team'].map(lambda team: np.sum(teams_fixturesDefPts_dict.get(team, [])))
 
 teams_stats_df['def_avg_pts/match'] = teams_stats_df['team'].map(lambda team: np.mean(teams_fixturesDefPts_dict.get(team, [])))
-teams_stats_df['def_avg_form'] = teams_stats_df['team'].map(lambda team: np.mean(teams_formFixturesDefPts_dict.get(team, [])))
-teams_stats_df['def_avg_xPts'] = golden_sum(teams_stats_df['def_avg_pts/match'], teams_stats_df['def_avg_form'])
+teams_stats_df['def_form'] = teams_stats_df['team'].map(lambda team: np.mean(teams_formFixturesDefPts_dict.get(team, [])))
+teams_stats_df['def_avg_xPts'] = golden_sum(teams_stats_df['def_avg_pts/match'], teams_stats_df['def_form'])
 teams_stats_df['Z(def_avg_xPts)'] = Z(teams_stats_df['def_avg_xPts'], "standard")
 
 teams_stats_df['def_med_pts/match'] = teams_stats_df['team'].map(lambda team: np.median(teams_fixturesDefPts_dict.get(team, [])))
-teams_stats_df['def_med_form'] = teams_stats_df['team'].map(lambda team: np.median(teams_formFixturesDefPts_dict.get(team, [])))
-teams_stats_df['def_med_xPts'] = golden_sum(teams_stats_df['def_med_pts/match'], teams_stats_df['def_med_form'])
+teams_stats_df['def_med_xPts'] = golden_sum(teams_stats_df['def_med_pts/match'], teams_stats_df['def_form'])
 teams_stats_df['Z(def_med_xPts)'] = Z(teams_stats_df['def_med_xPts'], "modified")
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_stats_df['att_tot_pts'] = teams_stats_df['team'].map(lambda team: np.sum(teams_fixturesAttPts_dict.get(team, [])))
 
 teams_stats_df['att_avg_pts/match'] = teams_stats_df['team'].map(lambda team: np.mean(teams_fixturesAttPts_dict.get(team, [])))
-teams_stats_df['att_avg_form'] = teams_stats_df['team'].map(lambda team: np.mean(teams_formFixturesAttPts_dict.get(team, [])))
-teams_stats_df['att_avg_xPts'] = golden_sum(teams_stats_df['att_avg_pts/match'], teams_stats_df['att_avg_form'])
+teams_stats_df['att_form'] = teams_stats_df['team'].map(lambda team: np.mean(teams_formFixturesAttPts_dict.get(team, [])))
+teams_stats_df['att_avg_xPts'] = golden_sum(teams_stats_df['att_avg_pts/match'], teams_stats_df['att_form'])
 teams_stats_df['Z(att_avg_xPts)'] = Z(teams_stats_df['att_avg_xPts']) ### Z-score of att_avg_xPts
 
 teams_stats_df['att_med_pts/match'] = teams_stats_df['team'].map(lambda team: np.median(teams_fixturesAttPts_dict.get(team, [])))
-teams_stats_df['att_med_form'] = teams_stats_df['team'].map(lambda team: np.median(teams_formFixturesAttPts_dict.get(team, [])))
-teams_stats_df['att_med_xPts'] = golden_sum(teams_stats_df['att_med_pts/match'], teams_stats_df['att_med_form'])
+teams_stats_df['att_med_xPts'] = golden_sum(teams_stats_df['att_med_pts/match'], teams_stats_df['att_form'])
 teams_stats_df['Z(att_med_xPts)'] = Z(teams_stats_df['att_med_xPts'], "modified")
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_stats_df['goals_for'] = teams_stats_df['team'].map(lambda team: np.sum(goals_for_dict.get(team, [])))
@@ -459,12 +468,11 @@ fpl_cols = [
     'fpl_tot_pts',
 
     'fpl_avg_pts/match',
-    'fpl_avg_form',
+    'fpl_form',
     'fpl_avg_xPts',
     'Z(fpl_avg_xPts)',
 
     'fpl_med_pts/match',
-    'fpl_med_form',
     'fpl_med_xPts',
     'Z(fpl_med_xPts)',
 
@@ -487,12 +495,11 @@ def_cols = [
     'def_tot_pts',
 
     'def_avg_pts/match',
-    'def_avg_form',
+    'def_form',
     'def_avg_xPts',
     'Z(def_avg_xPts)',
 
     'def_med_pts/match',
-    'def_med_form',
     'def_med_xPts',
     'Z(def_med_xPts)',
 
@@ -515,12 +522,11 @@ att_cols = [
     'att_tot_pts',
 
     'att_avg_pts/match',
-    'att_avg_form',
+    'att_form',
     'att_avg_xPts',
     'Z(att_avg_xPts)',
 
     'att_med_pts/match',
-    'att_med_form',
     'att_med_xPts',
     'Z(att_med_xPts)',
 
@@ -555,6 +561,7 @@ fpl_df = teams_stats_df[fpl_cols].sort_values([
     
     False
 ]) ### THIS SORTING IS IN-ORDER & EXHAUSTIVE!
+print(fpl_df)
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 def_df = teams_stats_df[def_cols].sort_values([
     'def_med_potential',    'def_avg_potential',
