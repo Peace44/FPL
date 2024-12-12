@@ -325,7 +325,11 @@ ascending=[
     False, False, False,
     False, False, False,
 ]) # 'form' gives you info on which players might be currently <appearing>/<playing well> or not
+######################################################################################################################################################################################################################################################################################################################################
 
+
+
+######################################################################################################################################################################################################################################################################################################################################
 teams_fixturesPtsFor_dict = {
     team: [list(dictionary.values()) for dictionary in array_of_dictionaries] for team, array_of_dictionaries in teams_fixturesPtsFor_dict.items()
 }
@@ -335,7 +339,7 @@ teams_fixturesDefPts_dict = {
 teams_fixturesAttPts_dict = {
     team: [list(dictionary.values()) for dictionary in array_of_dictionaries] for team, array_of_dictionaries in teams_fixturesAttPts_dict.items()
 }
-
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_fixturesPtsFor_dict = {
     team: [[item for sublist in list_of_lists[0:form_refGW-1] for item in sublist], [item for sublist in list_of_lists[form_refGW-1:] for item in sublist]] for team, list_of_lists in teams_fixturesPtsFor_dict.items()
 }
@@ -345,15 +349,16 @@ teams_fixturesDefPts_dict = {
 teams_fixturesAttPts_dict = {
     team: [[item for sublist in list_of_lists[0:form_refGW-1] for item in sublist], [item for sublist in list_of_lists[form_refGW-1:] for item in sublist]] for team, list_of_lists in teams_fixturesAttPts_dict.items()
 }
-
-teams_formFixturesPts_dict = {team: team_pts[1] for team, team_pts in teams_fixturesPtsFor_dict.items()}
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+teams_formFixturesPtsFor_dict = {team: team_pts[1] for team, team_pts in teams_fixturesPtsFor_dict.items()}
 teams_formFixturesDefPts_dict = {team: team_pts[1] for team, team_pts in teams_fixturesDefPts_dict.items()}
 teams_formFixturesAttPts_dict = {team: team_pts[1] for team, team_pts in teams_fixturesAttPts_dict.items()}
-
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_fixturesPtsFor_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesPtsFor_dict.items()}
 teams_fixturesDefPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesDefPts_dict.items()}
 teams_fixturesAttPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesAttPts_dict.items()}
-
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_fixturesPtsAgainst_dict = {
     home_team: [
         {
@@ -373,11 +378,11 @@ teams_fixturesPtsAgainst_dict = {
     for home_team in teams_fixturesPtsAgainst_dict
 }
 teams_fixturesPtsAgainst_dict = {
-    team: [
-        ptsAgainst for sublist in teams_fixturesPtsAgainst_dict[team] for ptsAgainst in sublist
-    ]
-    for team in teams_fixturesPtsAgainst_dict
+    team: [[item for sublist in list_of_lists[0:form_refGW-1] for item in sublist], [item for sublist in list_of_lists[form_refGW-1:] for item in sublist]] for team, list_of_lists in teams_fixturesPtsAgainst_dict.items()
 }
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+teams_formFixturesPtsAgainst_dict = {team: team_ptsAgainst[1] for team, team_ptsAgainst in teams_fixturesPtsAgainst_dict.items()}
+teams_fixturesPtsAgainst_dict = {team: team_ptsAgainst[0] + team_ptsAgainst[1] for team, team_ptsAgainst in teams_fixturesPtsAgainst_dict.items()}
 
 teams_fixturesPtsDiff_dict = {
     team: [
@@ -385,30 +390,38 @@ teams_fixturesPtsDiff_dict = {
     ]
     for team in teams_fixturesPtsDiff_dict
 }
+teams_formFixturesPtsDiff_dict = {
+    team: [
+        ptsFor - ptsAgainst for ptsFor, ptsAgainst in zip(teams_formFixturesPtsFor_dict[team], teams_formFixturesPtsAgainst_dict[team])
+    ]
+    for team in teams_formFixturesPtsFor_dict
+}
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+# print(teams_fixturesPtsFor_dict)
+# print("\n\n\n")
+# print(teams_fixturesPtsAgainst_dict)
+# print("\n\n\n")
+# print(teams_fixturesPtsDiff_dict)
+# print("\n\n\n")
 
+# print(teams_formFixturesPtsFor_dict)
 # print("\n\n\n")
-# print(players_fixturesPts_dict)
+# print(teams_formFixturesPtsAgainst_dict)
 # print("\n\n\n")
-# print(players_fixturesPlayedPts_dict)
+# print(teams_formFixturesPtsDiff_dict)
 # print("\n\n\n")
-# print(players_formFixturesPts_dict)
-print("\n\n\n")
-print(teams_fixturesPtsFor_dict)
-print("\n\n\n")
-print(teams_fixturesPtsAgainst_dict)
-print("\n\n\n")
-print(teams_fixturesPtsDiff_dict)
-print("\n\n\n")
+
 # print(teams_fixturesDefPts_dict)
 # print("\n\n\n")
 # print(teams_fixturesAttPts_dict)
 # print("\n\n\n")
-# print(teams_formFixturesPts_dict)
-# print("\n\n\n")
+
 # print(teams_formFixturesDefPts_dict)
 # print("\n\n\n")
 # print(teams_formFixturesAttPts_dict)
 # print("\n\n\n")
+
 # print(players_df.loc[(players_df['team'] == 'MCI')].head(37).to_string(index=False))
 # print("\n\n\n")
 # print(players_df.loc[(players_df['team'] == 'ARS')].head(37).to_string(index=False))
@@ -429,7 +442,7 @@ teams_stats_df['matches_played'] = teams_stats_df['team'].map(matches_played_dic
 teams_stats_df['fpl_tot_pts'] = teams_stats_df['team'].map(lambda team: np.sum(teams_fixturesPtsFor_dict.get(team, [])))
 
 teams_stats_df['fpl_avg_pts/match'] = teams_stats_df['team'].map(lambda team: np.mean(teams_fixturesPtsFor_dict.get(team, [])))
-teams_stats_df['fpl_form'] = teams_stats_df['team'].map(lambda team: np.mean(teams_formFixturesPts_dict.get(team, [])))
+teams_stats_df['fpl_form'] = teams_stats_df['team'].map(lambda team: np.mean(teams_formFixturesPtsFor_dict.get(team, [])))
 teams_stats_df['fpl_avg_xPts'] = golden_sum(teams_stats_df['fpl_avg_pts/match'], teams_stats_df['fpl_form'])
 teams_stats_df['Z(fpl_avg_xPts)'] = Z(teams_stats_df['fpl_avg_xPts'], "standard")
 
