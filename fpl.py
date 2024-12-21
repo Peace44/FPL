@@ -360,15 +360,26 @@ teams_fixturesDefPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts 
 teams_fixturesAttPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesAttPts_dict.items()}
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-teams_fixturesPtsAgainst_dict = {
-    home_team: [
-        {
-            away_team: teams_fixturesPtsFor_dict[away_team][i] for away_team in teams_fixturesPtsAgainst_dict[home_team][i]
-        }
-        for i in range(len(teams_fixturesPtsAgainst_dict[home_team])) 
-    ]
-    for home_team in teams_fixturesPtsAgainst_dict
-}
+print(teams_fixturesPtsFor_dict)
+input()
+print(teams_fixturesPtsAgainst_dict)
+input()
+# teams_fixturesPtsAgainst_dict = {
+#     home_team: [
+#         {
+#             away_team: teams_fixturesPtsFor_dict[away_team][i] for away_team in teams_fixturesPtsAgainst_dict[home_team][i]
+#         }
+#         for i in range(len(teams_fixturesPtsAgainst_dict[home_team])) 
+#     ]
+#     for home_team in teams_fixturesPtsAgainst_dict
+# }
+for home_team in teams_fixturesPtsAgainst_dict:
+    for i in range(len(teams_fixturesPtsAgainst_dict[home_team])):
+        away_team = next(iter(teams_fixturesPtsAgainst_dict[home_team][i]))
+        teams_fixturesPtsAgainst_dict[home_team][i][away_team] = teams_fixturesPtsFor_dict[away_team][i]
+        print(teams_fixturesPtsAgainst_dict[home_team][i])
+        input()
+        
 teams_fixturesPtsAgainst_dict = {
     home_team: [
         [
