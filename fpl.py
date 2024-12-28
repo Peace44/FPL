@@ -126,11 +126,12 @@ for fixture in fixtures_data:
     if fixture['event'] in range(1, refGW):
         teams_fixturesPtsFor_dict[home_team][fixture['event'] - 1][fixture_id] = 0
         teams_fixturesPtsFor_dict[away_team][fixture['event'] - 1][fixture_id] = 0
-        teams_fixturesPtsAgainst_dict[home_team][fixture['event'] - 1][away_team] = 0
-        teams_fixturesPtsAgainst_dict[away_team][fixture['event'] - 1][home_team] = 0
+        teams_fixturesPtsAgainst_dict[home_team][fixture['event'] - 1][fixture_id] = away_team
+        teams_fixturesPtsAgainst_dict[away_team][fixture['event'] - 1][fixture_id] = home_team
 
 teams_fixturesDefPts_dict = copy.deepcopy(teams_fixturesPtsFor_dict)
 teams_fixturesAttPts_dict = copy.deepcopy(teams_fixturesPtsFor_dict)
+
 # print('\n\n\n')
 # print(matches_played_dict)
 # print('\n\n\n')
@@ -143,6 +144,10 @@ teams_fixturesAttPts_dict = copy.deepcopy(teams_fixturesPtsFor_dict)
 # print(clean_sheets_dict)
 # print('\n\n\n')
 # print(teams_fixturesPtsFor_dict)
+# print('\n\n\n')
+# print(teams_fixturesPtsAgainst_dict)
+# print('\n\n\n')
+# print(teams_fixturesPtsDiff_dict)
 # print('\n\n\n')
 ######################################################################################################################################################################################################################################################################################################################################
 
@@ -331,8 +336,18 @@ ascending=[
 
 
 ######################################################################################################################################################################################################################################################################################################################################
+for home_team in teams_fixturesPtsAgainst_dict:
+    for i in range(len(teams_fixturesPtsAgainst_dict[home_team])):
+        for fixture_id in teams_fixturesPtsAgainst_dict[home_team][i]:
+            away_team = teams_fixturesPtsAgainst_dict[home_team][i][fixture_id]
+            away_team_pts = teams_fixturesPtsFor_dict[away_team][i][fixture_id]
+            teams_fixturesPtsAgainst_dict[home_team][i][fixture_id] = away_team_pts
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_fixturesPtsFor_dict = {
     team: [list(dictionary.values()) for dictionary in array_of_dictionaries] for team, array_of_dictionaries in teams_fixturesPtsFor_dict.items()
+}
+teams_fixturesPtsAgainst_dict = {
+    team: [list(dictionary.values()) for dictionary in array_of_dictionaries] for team, array_of_dictionaries in teams_fixturesPtsAgainst_dict.items()
 }
 teams_fixturesDefPts_dict = {
     team: [list(dictionary.values()) for dictionary in array_of_dictionaries] for team, array_of_dictionaries in teams_fixturesDefPts_dict.items()
@@ -344,6 +359,9 @@ teams_fixturesAttPts_dict = {
 teams_fixturesPtsFor_dict = {
     team: [[item for sublist in list_of_lists[0:form_refGW-1] for item in sublist], [item for sublist in list_of_lists[form_refGW-1:] for item in sublist]] for team, list_of_lists in teams_fixturesPtsFor_dict.items()
 }
+teams_fixturesPtsAgainst_dict = {
+    team: [[item for sublist in list_of_lists[0:form_refGW-1] for item in sublist], [item for sublist in list_of_lists[form_refGW-1:] for item in sublist]] for team, list_of_lists in teams_fixturesPtsAgainst_dict.items()
+}
 teams_fixturesDefPts_dict = {
     team: [[item for sublist in list_of_lists[0:form_refGW-1] for item in sublist], [item for sublist in list_of_lists[form_refGW-1:] for item in sublist]] for team, list_of_lists in teams_fixturesDefPts_dict.items()
 }
@@ -352,50 +370,15 @@ teams_fixturesAttPts_dict = {
 }
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_formFixturesPtsFor_dict = {team: team_pts[1] for team, team_pts in teams_fixturesPtsFor_dict.items()}
+teams_formFixturesPtsAgainst_dict = {team: team_ptsAgainst[1] for team, team_ptsAgainst in teams_fixturesPtsAgainst_dict.items()}
 teams_formFixturesDefPts_dict = {team: team_pts[1] for team, team_pts in teams_fixturesDefPts_dict.items()}
 teams_formFixturesAttPts_dict = {team: team_pts[1] for team, team_pts in teams_fixturesAttPts_dict.items()}
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_fixturesPtsFor_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesPtsFor_dict.items()}
+teams_fixturesPtsAgainst_dict = {team: team_ptsAgainst[0] + team_ptsAgainst[1] for team, team_ptsAgainst in teams_fixturesPtsAgainst_dict.items()}
 teams_fixturesDefPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesDefPts_dict.items()}
 teams_fixturesAttPts_dict = {team: team_pts[0] + team_pts[1] for team, team_pts in teams_fixturesAttPts_dict.items()}
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-print(teams_fixturesPtsFor_dict)
-input()
-print(teams_fixturesPtsAgainst_dict)
-input()
-# teams_fixturesPtsAgainst_dict = {
-#     home_team: [
-#         {
-#             away_team: teams_fixturesPtsFor_dict[away_team][i] for away_team in teams_fixturesPtsAgainst_dict[home_team][i]
-#         }
-#         for i in range(len(teams_fixturesPtsAgainst_dict[home_team])) 
-#     ]
-#     for home_team in teams_fixturesPtsAgainst_dict
-# }
-for home_team in teams_fixturesPtsAgainst_dict:
-    for i in range(len(teams_fixturesPtsAgainst_dict[home_team])):
-        away_team = next(iter(teams_fixturesPtsAgainst_dict[home_team][i]))
-        teams_fixturesPtsAgainst_dict[home_team][i][away_team] = teams_fixturesPtsFor_dict[away_team][i]
-        print(teams_fixturesPtsAgainst_dict[home_team][i])
-        input()
-        
-teams_fixturesPtsAgainst_dict = {
-    home_team: [
-        [
-            teams_fixturesPtsAgainst_dict[home_team][i][away_team] for away_team in teams_fixturesPtsAgainst_dict[home_team][i]
-        ]
-        for i in range(len(teams_fixturesPtsAgainst_dict[home_team])) 
-    ]
-    for home_team in teams_fixturesPtsAgainst_dict
-}
-teams_fixturesPtsAgainst_dict = {
-    team: [[item for sublist in list_of_lists[0:form_refGW-1] for item in sublist], [item for sublist in list_of_lists[form_refGW-1:] for item in sublist]] for team, list_of_lists in teams_fixturesPtsAgainst_dict.items()
-}
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-teams_formFixturesPtsAgainst_dict = {team: team_ptsAgainst[1] for team, team_ptsAgainst in teams_fixturesPtsAgainst_dict.items()}
-teams_fixturesPtsAgainst_dict = {team: team_ptsAgainst[0] + team_ptsAgainst[1] for team, team_ptsAgainst in teams_fixturesPtsAgainst_dict.items()}
-
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#        
 teams_fixturesPtsDiff_dict = {
     team: [
         ptsFor - ptsAgainst for ptsFor, ptsAgainst in zip(teams_fixturesPtsFor_dict[team], teams_fixturesPtsAgainst_dict[team])
@@ -408,7 +391,6 @@ teams_formFixturesPtsDiff_dict = {
     ]
     for team in teams_formFixturesPtsFor_dict
 }
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 # print(teams_fixturesPtsFor_dict)
 # print("\n\n\n")
