@@ -384,37 +384,223 @@ players_formFixturesBonus_dict = {player_id: [0 if bpts is None else bpts for bp
 
 for player_dict in players_stats:
     player_id = player_dict['id']
+    #---------------------------------------------------------------------------------------------------------#
     player_fixturesPlayedPts = players_fixturesPlayedPts_dict.get(player_id, [])
+    player_fixturesPlayedMinutes = players_fixturesPlayedMinutes_dict.get(player_id, [])
+    player_fixturesPlayedGoalsScored = players_fixturesPlayedGoalsScored_dict.get(player_id, [])
+    player_fixturesPlayedGoalsConceded = players_fixturesPlayedGoalsConceded_dict.get(player_id, [])
+    player_fixturesPlayedOwnGoals = players_fixturesPlayedOwnGoals_dict.get(player_id, [])
+    player_fixturesPlayedAssists = players_fixturesPlayedAssists_dict.get(player_id, [])
+    player_fixturesPlayedCleanSheets = players_fixturesPlayedCleanSheets_dict.get(player_id, [])
+    player_fixturesPlayedSaves = players_fixturesPlayedSaves_dict.get(player_id, [])
+    player_fixturesPlayedPenaltiesSaved = players_fixturesPlayedPenaltiesSaved_dict.get(player_id, [])
+    player_fixturesPlayedPenaltiesMissed = players_fixturesPlayedPenaltiesMissed_dict.get(player_id, [])
+    player_fixturesPlayedYellowCards = players_fixturesPlayedYellowCards_dict.get(player_id, [])
+    player_fixturesPlayedRedCards = players_fixturesPlayedRedCards_dict.get(player_id, [])
+    player_fixturesPlayedBonus = players_fixturesPlayedBonus_dict.get(player_id, [])
+    #---------------------------------------------------------------------------------------------------------#
     player_dict['tot_pts'] = np.sum(player_fixturesPlayedPts, dtype=int)
+    player_dict['tot_MP'] = np.sum(player_fixturesPlayedMinutes, dtype=int)
+    player_dict['tot_GS'] = np.sum(player_fixturesPlayedGoalsScored, dtype=int)
+    player_dict['tot_GC'] = np.sum(player_fixturesPlayedGoalsConceded, dtype=int)
+    player_dict['tot_OG'] = np.sum(player_fixturesPlayedOwnGoals, dtype=int)
+    player_dict['tot_A'] = np.sum(player_fixturesPlayedAssists, dtype=int)
+    player_dict['tot_CS'] = np.sum(player_fixturesPlayedCleanSheets, dtype=int)
+    player_dict['tot_S'] = np.sum(player_fixturesPlayedSaves, dtype=int)
+    player_dict['tot_PS'] = np.sum(player_fixturesPlayedPenaltiesSaved, dtype=int)
+    player_dict['tot_PM'] = np.sum(player_fixturesPlayedPenaltiesMissed, dtype=int)
+    player_dict['tot_YC'] = np.sum(player_fixturesPlayedYellowCards, dtype=int)
+    player_dict['tot_RC'] = np.sum(player_fixturesPlayedRedCards, dtype=int)
+    player_dict['tot_BP'] = np.sum(player_fixturesPlayedBonus, dtype=int)
+    #---------------------------------------------------------------------------------------------------------#
     player_dict['fxtrs_plyd'] = len(player_fixturesPlayedPts)
     player_dict['fxtrs_not_plyd'] = matches_played_dict[player_dict['team']] - player_dict['fxtrs_plyd']
-    player_fixturesNotPlayedPts = player_dict['fxtrs_not_plyd'] * [0]
+    player_fixturesNotPlayedX = player_dict['fxtrs_not_plyd'] * [0]
+    #---------------------------------------------------------------------------------------------------------#
     player_formFixturesPts = players_formFixturesPts_dict.get(player_id, [])
+    player_formFixturesMinutes = players_formFixturesMinutes_dict.get(player_id, [])
+    player_formFixturesGoalsScored = players_formFixturesGoalsScored_dict.get(player_id, [])
+    player_formFixturesGoalsConceded = players_formFixturesGoalsConceded_dict.get(player_id, [])
+    player_formFixturesOwnGoals = players_formFixturesOwnGoals_dict.get(player_id, [])
+    player_formFixturesAssists = players_formFixturesAssists_dict.get(player_id, [])
+    player_formFixturesCleanSheets = players_formFixturesCleanSheets_dict.get(player_id, [])
+    player_formFixturesSaves = players_formFixturesSaves_dict.get(player_id, [])
+    player_formFixturesPenaltiesSaved = players_formFixturesPenaltiesSaved_dict.get(player_id, [])
+    player_formFixturesPenaltiesMissed = players_formFixturesPenaltiesMissed_dict.get(player_id, [])
+    player_formFixturesYellowCards = players_formFixturesYellowCards_dict.get(player_id, [])
+    player_formFixturesRedCards = players_formFixturesRedCards_dict.get(player_id, [])
+    player_formFixturesBonus = players_formFixturesBonus_dict.get(player_id, [])
     #######################################################################################################################################################################################################################    
-    player_dict['med_form'], player_dict['MedAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "median")
-    player_dict['form'], player_dict['MeanAbsDev(form)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "mean") ### form is a player's average score per match, calculated from all matches played by his club in the last 30 days.
-    player_dict['StdDev(form)'] = np.std(player_formFixturesPts) if len(player_formFixturesPts) > 0 else 0
+    player_dict['med_formPts'], player_dict['MedAbsDev(formPts)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "median")
+    player_dict['formPts'], player_dict['MeanAbsDev(formPts)'] = calculate_central_tendency_and_deviation(player_formFixturesPts, "mean") ### formPts is a player's average score per match, calculated from all matches played by his club in the last 30 days.
+    player_dict['StdDev(formPts)'] = np.std(player_formFixturesPts) if len(player_formFixturesPts) > 0 else 0
 
-    player_dict['med_pts/fxtr'], player_dict['MedAbsDev(pts/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "median")
-    player_dict['avg_pts/fxtr'], player_dict['MeanAbsDev(pts/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedPts, "mean") ### avg_pts/fxtr is a player's average score per match, calculated from all matches played by his club throughout the whole season.
-    player_dict['StdDev(pts/fxtr)'] = np.std(player_fixturesPlayedPts + player_fixturesNotPlayedPts) if len(player_fixturesPlayedPts + player_fixturesNotPlayedPts) > 0 else 0
+    player_dict['med_formMP'], player_dict['MedAbsDev(formMP)'] = calculate_central_tendency_and_deviation(player_formFixturesMinutes, "median")
+    player_dict['formMP'], player_dict['MeanAbsDev(formMP)'] = calculate_central_tendency_and_deviation(player_formFixturesMinutes, "mean")
+    player_dict['StdDev(formMP)'] = np.std(player_formFixturesMinutes) if len(player_formFixturesMinutes) > 0 else 0
 
+    player_dict['med_formGS'], player_dict['MedAbsDev(formGS)'] = calculate_central_tendency_and_deviation(player_formFixturesGoalsScored, "median")
+    player_dict['formGS'], player_dict['MeanAbsDev(formGS)'] = calculate_central_tendency_and_deviation(player_formFixturesGoalsScored, "mean")
+    player_dict['StdDev(formGS)'] = np.std(player_formFixturesGoalsScored) if len(player_formFixturesGoalsScored) > 0 else 0
+
+    player_dict['med_formGC'], player_dict['MedAbsDev(formGC)'] = calculate_central_tendency_and_deviation(player_formFixturesGoalsConceded, "median")
+    player_dict['formGC'], player_dict['MeanAbsDev(formGC)'] = calculate_central_tendency_and_deviation(player_formFixturesGoalsConceded, "mean")
+    player_dict['StdDev(formGC)'] = np.std(player_formFixturesGoalsConceded) if len(player_formFixturesGoalsConceded) > 0 else 0
+
+    player_dict['med_formOG'], player_dict['MedAbsDev(formOG)'] = calculate_central_tendency_and_deviation(player_formFixturesOwnGoals, "median")
+    player_dict['formOG'], player_dict['MeanAbsDev(formOG)'] = calculate_central_tendency_and_deviation(player_formFixturesOwnGoals, "mean")
+    player_dict['StdDev(formOG)'] = np.std(player_formFixturesOwnGoals) if len(player_formFixturesOwnGoals) > 0 else 0
+
+    player_dict['med_formA'], player_dict['MedAbsDev(formA)'] = calculate_central_tendency_and_deviation(player_formFixturesAssists, "median")
+    player_dict['formA'], player_dict['MeanAbsDev(formA)'] = calculate_central_tendency_and_deviation(player_formFixturesAssists, "mean")
+    player_dict['StdDev(formA)'] = np.std(player_formFixturesAssists) if len(player_formFixturesAssists) > 0 else 0
+
+    player_dict['med_formCS'], player_dict['MedAbsDev(formCS)'] = calculate_central_tendency_and_deviation(player_formFixturesCleanSheets, "median")
+    player_dict['formCS'], player_dict['MeanAbsDev(formCS)'] = calculate_central_tendency_and_deviation(player_formFixturesCleanSheets, "mean")
+    player_dict['StdDev(formCS)'] = np.std(player_formFixturesCleanSheets) if len(player_formFixturesCleanSheets) > 0 else 0
+
+    player_dict['med_formS'], player_dict['MedAbsDev(formS)'] = calculate_central_tendency_and_deviation(player_formFixturesSaves, "median")
+    player_dict['formS'], player_dict['MeanAbsDev(formS)'] = calculate_central_tendency_and_deviation(player_formFixturesSaves, "mean")
+    player_dict['StdDev(formS)'] = np.std(player_formFixturesSaves) if len(player_formFixturesSaves) > 0 else 0
+
+    player_dict['med_formPS'], player_dict['MedAbsDev(formPS)'] = calculate_central_tendency_and_deviation(player_formFixturesPenaltiesSaved, "median")
+    player_dict['formPS'], player_dict['MeanAbsDev(formPS)'] = calculate_central_tendency_and_deviation(player_formFixturesPenaltiesSaved, "mean")
+    player_dict['StdDev(formPS)'] = np.std(player_formFixturesPenaltiesSaved) if len(player_formFixturesPenaltiesSaved) > 0 else 0
+
+    player_dict['med_formPM'], player_dict['MedAbsDev(formPM)'] = calculate_central_tendency_and_deviation(player_formFixturesPenaltiesMissed, "median")
+    player_dict['formPM'], player_dict['MeanAbsDev(formPM)'] = calculate_central_tendency_and_deviation(player_formFixturesPenaltiesMissed, "mean")
+    player_dict['StdDev(formPM)'] = np.std(player_formFixturesPenaltiesMissed) if len(player_formFixturesPenaltiesMissed) > 0 else 0
+
+    player_dict['med_formYC'], player_dict['MedAbsDev(formYC)'] = calculate_central_tendency_and_deviation(player_formFixturesYellowCards, "median")
+    player_dict['formYC'], player_dict['MeanAbsDev(formYC)'] = calculate_central_tendency_and_deviation(player_formFixturesYellowCards, "mean")
+    player_dict['StdDev(formYC)'] = np.std(player_formFixturesYellowCards) if len(player_formFixturesYellowCards) > 0 else 0
+
+    player_dict['med_formRC'], player_dict['MedAbsDev(formRC)'] = calculate_central_tendency_and_deviation(player_formFixturesRedCards, "median")
+    player_dict['formRC'], player_dict['MeanAbsDev(formRC)'] = calculate_central_tendency_and_deviation(player_formFixturesRedCards, "mean")
+    player_dict['StdDev(formRC)'] = np.std(player_formFixturesRedCards) if len(player_formFixturesRedCards) > 0 else 0
+
+    player_dict['med_formBP'], player_dict['MedAbsDev(formBP)'] = calculate_central_tendency_and_deviation(player_formFixturesBonus, "median")
+    player_dict['formBP'], player_dict['MeanAbsDev(formBP)'] = calculate_central_tendency_and_deviation(player_formFixturesBonus, "mean")
+    player_dict['StdDev(formBP)'] = np.std(player_formFixturesBonus) if len(player_formFixturesBonus) > 0 else 0
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    player_dict['med_pts/fxtr'], player_dict['MedAbsDev(pts/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedX, "median")
+    player_dict['avg_pts/fxtr'], player_dict['MeanAbsDev(pts/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedX, "mean") ### avg_pts/fxtr is a player's average score per match, calculated from all matches played by his club throughout the whole season.
+    player_dict['StdDev(pts/fxtr)'] = np.std(player_fixturesPlayedPts + player_fixturesNotPlayedX) if len(player_fixturesPlayedPts + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_MP/fxtr'], player_dict['MedAbsDev(MP/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedMinutes + player_fixturesNotPlayedX, "median")
+    player_dict['avg_MP/fxtr'], player_dict['MeanAbsDev(MP/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedMinutes + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(MP/fxtr)'] = np.std(player_fixturesPlayedMinutes + player_fixturesNotPlayedX) if len(player_fixturesPlayedMinutes + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_GS/fxtr'], player_dict['MedAbsDev(GS/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedGoalsScored + player_fixturesNotPlayedX, "median")
+    player_dict['avg_GS/fxtr'], player_dict['MeanAbsDev(GS/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedGoalsScored + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(GS/fxtr)'] = np.std(player_fixturesPlayedGoalsScored + player_fixturesNotPlayedX) if len(player_fixturesPlayedGoalsScored + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_GC/fxtr'], player_dict['MedAbsDev(GC/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedGoalsConceded + player_fixturesNotPlayedX, "median")
+    player_dict['avg_GC/fxtr'], player_dict['MeanAbsDev(GC/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedGoalsConceded + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(GC/fxtr)'] = np.std(player_fixturesPlayedGoalsConceded + player_fixturesNotPlayedX) if len(player_fixturesPlayedGoalsConceded + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_OG/fxtr'], player_dict['MedAbsDev(OG/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedOwnGoals + player_fixturesNotPlayedX, "median")
+    player_dict['avg_OG/fxtr'], player_dict['MeanAbsDev(OG/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedOwnGoals + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(OG/fxtr)'] = np.std(player_fixturesPlayedOwnGoals + player_fixturesNotPlayedX) if len(player_fixturesPlayedOwnGoals + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_A/fxtr'], player_dict['MedAbsDev(A/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedAssists + player_fixturesNotPlayedX, "median")
+    player_dict['avg_A/fxtr'], player_dict['MeanAbsDev(A/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedAssists + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(A/fxtr)'] = np.std(player_fixturesPlayedAssists + player_fixturesNotPlayedX) if len(player_fixturesPlayedAssists + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_CS/fxtr'], player_dict['MedAbsDev(CS/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedCleanSheets + player_fixturesNotPlayedX, "median")
+    player_dict['avg_CS/fxtr'], player_dict['MeanAbsDev(CS/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedCleanSheets + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(CS/fxtr)'] = np.std(player_fixturesPlayedCleanSheets + player_fixturesNotPlayedX) if len(player_fixturesPlayedCleanSheets + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_S/fxtr'], player_dict['MedAbsDev(S/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedSaves + player_fixturesNotPlayedX, "median")
+    player_dict['avg_S/fxtr'], player_dict['MeanAbsDev(S/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedSaves + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(S/fxtr)'] = np.std(player_fixturesPlayedSaves + player_fixturesNotPlayedX) if len(player_fixturesPlayedSaves + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_PS/fxtr'], player_dict['MedAbsDev(PS/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPenaltiesSaved + player_fixturesNotPlayedX, "median")
+    player_dict['avg_PS/fxtr'], player_dict['MeanAbsDev(PS/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPenaltiesSaved + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(PS/fxtr)'] = np.std(player_fixturesPlayedPenaltiesSaved + player_fixturesNotPlayedX) if len(player_fixturesPlayedPenaltiesSaved + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_PM/fxtr'], player_dict['MedAbsDev(PM/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPenaltiesMissed + player_fixturesNotPlayedX, "median")
+    player_dict['avg_PM/fxtr'], player_dict['MeanAbsDev(PM/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPenaltiesMissed + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(PM/fxtr)'] = np.std(player_fixturesPlayedPenaltiesMissed + player_fixturesNotPlayedX) if len(player_fixturesPlayedPenaltiesMissed + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_YC/fxtr'], player_dict['MedAbsDev(YC/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedYellowCards + player_fixturesNotPlayedX, "median")
+    player_dict['avg_YC/fxtr'], player_dict['MeanAbsDev(YC/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedYellowCards + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(YC/fxtr)'] = np.std(player_fixturesPlayedYellowCards + player_fixturesNotPlayedX) if len(player_fixturesPlayedYellowCards + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_RC/fxtr'], player_dict['MedAbsDev(RC/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedRedCards + player_fixturesNotPlayedX, "median")
+    player_dict['avg_RC/fxtr'], player_dict['MeanAbsDev(RC/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedRedCards + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(RC/fxtr)'] = np.std(player_fixturesPlayedRedCards + player_fixturesNotPlayedX) if len(player_fixturesPlayedRedCards + player_fixturesNotPlayedX) > 0 else 0
+
+    player_dict['med_BP/fxtr'], player_dict['MedAbsDev(BP/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedBonus + player_fixturesNotPlayedX, "median")
+    player_dict['avg_BP/fxtr'], player_dict['MeanAbsDev(BP/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedBonus + player_fixturesNotPlayedX, "mean")
+    player_dict['StdDev(BP/fxtr)'] = np.std(player_fixturesPlayedBonus + player_fixturesNotPlayedX) if len(player_fixturesPlayedBonus + player_fixturesNotPlayedX) > 0 else 0
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
     player_dict['med_pts/fxtr_plyd'], player_dict['MedAbsDev(pts/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "median")
     player_dict['avg_pts/fxtr_plyd'], player_dict['MeanAbsDev(pts/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "mean")
     player_dict['StdDev(pts/fxtr_plyd)'] = np.std(player_fixturesPlayedPts) if len(player_fixturesPlayedPts) > 0 else 0
-    #######################################################################################################################################################################################################################
 
+    player_dict['med_MP/fxtr_plyd'], player_dict['MedAbsDev(MP/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedMinutes, "median")
+    player_dict['avg_MP/fxtr_plyd'], player_dict['MeanAbsDev(MP/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedMinutes, "mean")
+    player_dict['StdDev(MP/fxtr_plyd)'] = np.std(player_fixturesPlayedMinutes) if len(player_fixturesPlayedMinutes) > 0 else 0
+
+    player_dict['med_GS/fxtr_plyd'], player_dict['MedAbsDev(GS/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedGoalsScored, "median")
+    player_dict['avg_GS/fxtr_plyd'], player_dict['MeanAbsDev(GS/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedGoalsScored, "mean")
+    player_dict['StdDev(GS/fxtr_plyd)'] = np.std(player_fixturesPlayedGoalsScored) if len(player_fixturesPlayedGoalsScored) > 0 else 0
+
+    player_dict['med_GC/fxtr_plyd'], player_dict['MedAbsDev(GC/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedGoalsConceded, "median")
+    player_dict['avg_GC/fxtr_plyd'], player_dict['MeanAbsDev(GC/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedGoalsConceded, "mean")
+    player_dict['StdDev(GC/fxtr_plyd)'] = np.std(player_fixturesPlayedGoalsConceded) if len(player_fixturesPlayedGoalsConceded) > 0 else 0
+
+    player_dict['med_OG/fxtr_plyd'], player_dict['MedAbsDev(OG/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedOwnGoals, "median")
+    player_dict['avg_OG/fxtr_plyd'], player_dict['MeanAbsDev(OG/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedOwnGoals, "mean")
+    player_dict['StdDev(OG/fxtr_plyd)'] = np.std(player_fixturesPlayedOwnGoals) if len(player_fixturesPlayedOwnGoals) > 0 else 0
+
+    player_dict['med_A/fxtr_plyd'], player_dict['MedAbsDev(A/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedAssists, "median")
+    player_dict['avg_A/fxtr_plyd'], player_dict['MeanAbsDev(A/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedAssists, "mean")
+    player_dict['StdDev(A/fxtr_plyd)'] = np.std(player_fixturesPlayedAssists) if len(player_fixturesPlayedAssists) > 0 else 0
+
+    player_dict['med_CS/fxtr_plyd'], player_dict['MedAbsDev(CS/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedCleanSheets, "median")
+    player_dict['avg_CS/fxtr_plyd'], player_dict['MeanAbsDev(CS/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedCleanSheets, "mean")
+    player_dict['StdDev(CS/fxtr_plyd)'] = np.std(player_fixturesPlayedCleanSheets) if len(player_fixturesPlayedCleanSheets) > 0 else 0
+
+    player_dict['med_S/fxtr_plyd'], player_dict['MedAbsDev(S/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedSaves, "median")
+    player_dict['avg_S/fxtr_plyd'], player_dict['MeanAbsDev(S/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedSaves, "mean")
+    player_dict['StdDev(S/fxtr_plyd)'] = np.std(player_fixturesPlayedSaves) if len(player_fixturesPlayedSaves) > 0 else 0
+
+    player_dict['med_PS/fxtr_plyd'], player_dict['MedAbsDev(PS/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPenaltiesSaved, "median")
+    player_dict['avg_PS/fxtr_plyd'], player_dict['MeanAbsDev(PS/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPenaltiesSaved, "mean")
+    player_dict['StdDev(PS/fxtr_plyd)'] = np.std(player_fixturesPlayedPenaltiesSaved) if len(player_fixturesPlayedPenaltiesSaved) > 0 else 0
+
+    player_dict['med_PM/fxtr_plyd'], player_dict['MedAbsDev(PM/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPenaltiesMissed, "median")
+    player_dict['avg_PM/fxtr_plyd'], player_dict['MeanAbsDev(PM/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPenaltiesMissed, "mean")
+    player_dict['StdDev(PM/fxtr_plyd)'] = np.std(player_fixturesPlayedPenaltiesMissed) if len(player_fixturesPlayedPenaltiesMissed) > 0 else 0
+
+    player_dict['med_YC/fxtr_plyd'], player_dict['MedAbsDev(YC/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedYellowCards, "median")
+    player_dict['avg_YC/fxtr_plyd'], player_dict['MeanAbsDev(YC/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedYellowCards, "mean")
+    player_dict['StdDev(YC/fxtr_plyd)'] = np.std(player_fixturesPlayedYellowCards) if len(player_fixturesPlayedYellowCards) > 0 else 0
+
+    player_dict['med_RC/fxtr_plyd'], player_dict['MedAbsDev(RC/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedRedCards, "median")
+    player_dict['avg_RC/fxtr_plyd'], player_dict['MeanAbsDev(RC/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedRedCards, "mean")
+    player_dict['StdDev(RC/fxtr_plyd)'] = np.std(player_fixturesPlayedRedCards) if len(player_fixturesPlayedRedCards) > 0 else 0
+
+    player_dict['med_BP/fxtr_plyd'], player_dict['MedAbsDev(BP/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedBonus, "median")
+    player_dict['avg_BP/fxtr_plyd'], player_dict['MeanAbsDev(BP/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedBonus, "mean")
+    player_dict['StdDev(BP/fxtr_plyd)'] = np.std(player_fixturesPlayedBonus) if len(player_fixturesPlayedBonus) > 0 else 0
+    #######################################################################################################################################################################################################################
+    print(player_dict, end="\n\n\n")
+    input()
+    
 players_df = pd.DataFrame(players_stats).set_index('id', drop=False)
 players_df = players_df.sort_values([
     'team',
 
-    'med_form',                 'form',
+    'med_formPts',                 'formPts',
     'med_pts/fxtr',             'avg_pts/fxtr',
     'med_pts/fxtr_plyd',        'avg_pts/fxtr_plyd',
 
     'tot_pts', ### I really hope this is the last sorting criteria!!! I wouldn't like the sorting to resort to the criteria below bcoz they might be problematic!!!
 
-    'MedAbsDev(form)',          'MeanAbsDev(form)',             'StdDev(form)',
+    'MedAbsDev(formPts)',          'MeanAbsDev(formPts)',             'StdDev(formPts)',
     'MedAbsDev(pts/fxtr)',      'MeanAbsDev(pts/fxtr)',         'StdDev(pts/fxtr)',
     'MedAbsDev(pts/fxtr_plyd)', 'MeanAbsDev(pts/fxtr_plyd)',    'StdDev(pts/fxtr_plyd)',
 ], 
@@ -430,7 +616,7 @@ ascending=[
     False, False, False,
     False, False, False,
     False, False, False,
-]) # 'form' gives you info on which players might be currently <appearing>/<playing well> or not
+]) # 'formPts' gives you info on which players might be currently <appearing>/<playing well> or not
 ######################################################################################################################################################################################################################################################################################################################################
 
 
@@ -541,8 +727,8 @@ teams_stats_df['fpl_avg_xPts'] = golden_sum(teams_stats_df['fpl_avg_pts/match'],
 teams_stats_df['Z(fpl_avg_xPts)'] = Z(teams_stats_df['fpl_avg_xPts'], "standard")
 
 teams_stats_df['fpl_med_pts/match'] = teams_stats_df['team'].map(lambda team: np.median(teams_fixturesPtsDiff_dict.get(team, [])))
-teams_stats_df['fpl_med_form'] = teams_stats_df['team'].map(lambda team: np.median(teams_formFixturesPtsDiff_dict.get(team, [])))
-teams_stats_df['fpl_med_xPts'] = golden_sum(teams_stats_df['fpl_med_pts/match'], teams_stats_df['fpl_med_form'])
+teams_stats_df['fpl_med_formPts'] = teams_stats_df['team'].map(lambda team: np.median(teams_formFixturesPtsDiff_dict.get(team, [])))
+teams_stats_df['fpl_med_xPts'] = golden_sum(teams_stats_df['fpl_med_pts/match'], teams_stats_df['fpl_med_formPts'])
 teams_stats_df['Z(fpl_med_xPts)'] = Z(teams_stats_df['fpl_med_xPts'])
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_stats_df['def_pts'] = teams_stats_df['team'].map(lambda team: np.sum(teams_fixturesDefPts_dict.get(team, [])))
@@ -553,8 +739,8 @@ teams_stats_df['def_avg_xPts'] = golden_sum(teams_stats_df['def_avg_pts/match'],
 teams_stats_df['Z(def_avg_xPts)'] = Z(teams_stats_df['def_avg_xPts'], "standard")
 
 teams_stats_df['def_med_pts/match'] = teams_stats_df['team'].map(lambda team: np.median(teams_fixturesDefPts_dict.get(team, [])))
-teams_stats_df['def_med_form'] = teams_stats_df['team'].map(lambda team: np.median(teams_formFixturesDefPts_dict.get(team, [])))
-teams_stats_df['def_med_xPts'] = golden_sum(teams_stats_df['def_med_pts/match'], teams_stats_df['def_med_form'])
+teams_stats_df['def_med_formPts'] = teams_stats_df['team'].map(lambda team: np.median(teams_formFixturesDefPts_dict.get(team, [])))
+teams_stats_df['def_med_xPts'] = golden_sum(teams_stats_df['def_med_pts/match'], teams_stats_df['def_med_formPts'])
 teams_stats_df['Z(def_med_xPts)'] = Z(teams_stats_df['def_med_xPts'])
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_stats_df['att_pts'] = teams_stats_df['team'].map(lambda team: np.sum(teams_fixturesAttPts_dict.get(team, [])))
@@ -565,8 +751,8 @@ teams_stats_df['att_avg_xPts'] = golden_sum(teams_stats_df['att_avg_pts/match'],
 teams_stats_df['Z(att_avg_xPts)'] = Z(teams_stats_df['att_avg_xPts']) ### Z-score of att_avg_xPts
 
 teams_stats_df['att_med_pts/match'] = teams_stats_df['team'].map(lambda team: np.median(teams_fixturesAttPts_dict.get(team, [])))
-teams_stats_df['att_med_form'] = teams_stats_df['team'].map(lambda team: np.median(teams_formFixturesAttPts_dict.get(team, [])))
-teams_stats_df['att_med_xPts'] = golden_sum(teams_stats_df['att_med_pts/match'], teams_stats_df['att_med_form'])
+teams_stats_df['att_med_formPts'] = teams_stats_df['team'].map(lambda team: np.median(teams_formFixturesAttPts_dict.get(team, [])))
+teams_stats_df['att_med_xPts'] = golden_sum(teams_stats_df['att_med_pts/match'], teams_stats_df['att_med_formPts'])
 teams_stats_df['Z(att_med_xPts)'] = Z(teams_stats_df['att_med_xPts'])
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 teams_stats_df['goals_for'] = teams_stats_df['team'].map(lambda team: np.sum(goals_for_dict.get(team, [])))
@@ -622,7 +808,7 @@ fpl_cols = [
     'Z(fpl_avg_xPts)',
 
     'fpl_med_pts/match',
-    'fpl_med_form',
+    'fpl_med_formPts',
     'fpl_med_xPts',
     'Z(fpl_med_xPts)',
 
@@ -650,7 +836,7 @@ def_cols = [
     'Z(def_avg_xPts)',
 
     'def_med_pts/match',
-    'def_med_form',
+    'def_med_formPts',
     'def_med_xPts',
     'Z(def_med_xPts)',
 
@@ -678,7 +864,7 @@ att_cols = [
     'Z(att_avg_xPts)',
 
     'att_med_pts/match',
-    'att_med_form',
+    'att_med_formPts',
     'att_med_xPts',
     'Z(att_med_xPts)',
 
@@ -697,7 +883,7 @@ att_cols = [
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 fpl_df = teams_stats_df[fpl_cols].sort_values([
-    'med_GD/match', 'fpl_med_pts/match', 'fpl_med_form',            
+    'med_GD/match', 'fpl_med_pts/match', 'fpl_med_formPts',            
     'avg_GD/match', 'fpl_avg_pts/match', 'fpl_form', ### I really hope these are the last sorting criteria!!!         
     'fpl_pts',
     'avg_CS/match'
@@ -709,7 +895,7 @@ fpl_df = teams_stats_df[fpl_cols].sort_values([
 ])
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 def_df = teams_stats_df[def_cols].sort_values([
-    'med_GA/match', 'def_med_pts/match', 'def_med_form',            
+    'med_GA/match', 'def_med_pts/match', 'def_med_formPts',            
     'avg_GA/match', 'def_avg_pts/match', 'def_form', ### I really hope these are the last sorting criteria!!!         
     'def_pts',
     'avg_CS/match',
@@ -721,7 +907,7 @@ def_df = teams_stats_df[def_cols].sort_values([
 ])
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
 att_df = teams_stats_df[att_cols].sort_values([
-    'med_GF/match', 'att_med_pts/match', 'att_med_form',            
+    'med_GF/match', 'att_med_pts/match', 'att_med_formPts',            
     'avg_GF/match', 'att_avg_pts/match', 'att_form', ### I really hope these are the last sorting criteria!!!         
     'att_pts',
     'avg_CS/match'
