@@ -251,6 +251,19 @@ for player in players:
 
 ######################################################################################################################################################################################################################################################################################################################################
 players_fixturesPts_dict = {}
+players_fixturesMinutes_dict = {}
+players_fixturesGoalsScored_dict = {}
+players_fixturesGoalsConceded_dict = {}
+players_fixturesOwnGoals_dict = {}
+players_fixturesAssists_dict = {}
+players_fixturesCleanSheets_dict = {}
+players_fixturesSaves_dict = {}
+players_fixturesPenaltiesSaved_dict = {}
+players_fixturesPenaltiesMissed_dict = {}
+players_fixturesYellowCards_dict = {}
+players_fixturesRedCards_dict = {}
+players_fixturesBonus_dict = {}
+
 for gw in range(1, refGW): ### fetch per-gameweek data for all players
     response = requests.get(gameweeks_info_url.format(gw))
     gwData = response.json()
@@ -259,11 +272,36 @@ for gw in range(1, refGW): ### fetch per-gameweek data for all players
         player_id = element['id']
         if player_id not in players_fixturesPts_dict:
             players_fixturesPts_dict[player_id] = [[],[]]
+            players_fixturesMinutes_dict[player_id] = [[],[]]
+            players_fixturesGoalsScored_dict[player_id] = [[],[]]
+            players_fixturesGoalsConceded_dict[player_id] = [[],[]]
+            players_fixturesOwnGoals_dict[player_id] = [[],[]]
+            players_fixturesAssists_dict[player_id] = [[],[]]
+            players_fixturesCleanSheets_dict[player_id] = [[],[]]
+            players_fixturesSaves_dict[player_id] = [[],[]]
+            players_fixturesPenaltiesSaved_dict[player_id] = [[],[]]
+            players_fixturesPenaltiesMissed_dict[player_id] = [[],[]]
+            players_fixturesYellowCards_dict[player_id] = [[],[]]
+            players_fixturesRedCards_dict[player_id] = [[],[]]
+            players_fixturesBonus_dict[player_id] = [[],[]]
         player_team = teams_dict[players_dict[player_id]['team']]
         player_position = positions_dict[players_dict[player_id]['element_type']]
-        gwMinutes = element['stats']['minutes']
+        element_stats = element['stats']
+        gwMinutes = element_stats['minutes']
         if gwMinutes == 0:
             players_fixturesPts_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesPts_dict[player_id][1].append(None)
+            players_fixturesMinutes_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesMinutes_dict[player_id][1].append(None)
+            players_fixturesGoalsScored_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesGoalsScored_dict[player_id][1].append(None)
+            players_fixturesGoalsConceded_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesGoalsConceded_dict[player_id][1].append(None)
+            players_fixturesOwnGoals_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesOwnGoals_dict[player_id][1].append(None)
+            players_fixturesAssists_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesAssists_dict[player_id][1].append(None)
+            players_fixturesCleanSheets_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesCleanSheets_dict[player_id][1].append(None)
+            players_fixturesSaves_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesSaves_dict[player_id][1].append(None)
+            players_fixturesPenaltiesSaved_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesPenaltiesSaved_dict[player_id][1].append(None)
+            players_fixturesPenaltiesMissed_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesPenaltiesMissed_dict[player_id][1].append(None)
+            players_fixturesYellowCards_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesYellowCards_dict[player_id][1].append(None)
+            players_fixturesRedCards_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesRedCards_dict[player_id][1].append(None)
+            players_fixturesBonus_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesBonus_dict[player_id][1].append(None)
         else:
             gwFixtures = element['explain']
             for gwFixture in gwFixtures: ### sometimes we have 2ble gameweeks!
@@ -271,16 +309,78 @@ for gw in range(1, refGW): ### fetch per-gameweek data for all players
                 fixture_stats = gwFixture['stats']
                 fixture_pts = sum(fixture_stat['points'] for fixture_stat in fixture_stats)
                 fixture_minutes = fixture_stats[0]['value'] if fixture_stats[0]['identifier'] == 'minutes' else None
+                #-------THE CODE BELOW CAN ONLY WORK BEFORE THERE ARE 2BLE GAMEWEEKS-------------------------------#
+                fixture_goals_scored = element_stats['goals_scored']
+                fixture_goals_conceded = element_stats['goals_conceded']
+                fixture_own_goals = element_stats['own_goals']
+                fixture_assists = element_stats['assists']
+                fixture_clean_sheets = element_stats['clean_sheets']
+                fixture_saves = element_stats['saves']
+                fixture_penalties_saved = element_stats['penalties_saved']
+                fixture_penalties_missed = element_stats['penalties_missed']
+                fixture_yellow_cards = element_stats['yellow_cards']
+                fixture_red_cards = element_stats['red_cards']
+                fixture_bonus = element_stats['bonus']
+                #-------THE CODE ABOVE CAN ONLY WORK BEFORE THERE ARE 2BLE GAMEWEEKS-------------------------------#
                 if fixture_minutes > 0: ### if the player actually played in that fixture        
                     players_fixturesPts_dict[player_id][0].append(fixture_pts) if gw < form_refGW else players_fixturesPts_dict[player_id][1].append(fixture_pts)
+                    players_fixturesMinutes_dict[player_id][0].append(fixture_minutes) if gw < form_refGW else players_fixturesMinutes_dict[player_id][1].append(fixture_minutes)
+                    players_fixturesGoalsScored_dict[player_id][0].append(fixture_goals_scored) if gw < form_refGW else players_fixturesGoalsScored_dict[player_id][1].append(fixture_goals_scored)
+                    players_fixturesGoalsConceded_dict[player_id][0].append(fixture_goals_conceded) if gw < form_refGW else players_fixturesGoalsConceded_dict[player_id][1].append(fixture_goals_conceded)
+                    players_fixturesOwnGoals_dict[player_id][0].append(fixture_own_goals) if gw < form_refGW else players_fixturesOwnGoals_dict[player_id][1].append(fixture_own_goals)
+                    players_fixturesAssists_dict[player_id][0].append(fixture_assists) if gw < form_refGW else players_fixturesAssists_dict[player_id][1].append(fixture_assists)
+                    players_fixturesCleanSheets_dict[player_id][0].append(fixture_clean_sheets) if gw < form_refGW else players_fixturesCleanSheets_dict[player_id][1].append(fixture_clean_sheets)
+                    players_fixturesSaves_dict[player_id][0].append(fixture_saves) if gw < form_refGW else players_fixturesSaves_dict[player_id][1].append(fixture_saves)
+                    players_fixturesPenaltiesSaved_dict[player_id][0].append(fixture_penalties_saved) if gw < form_refGW else players_fixturesPenaltiesSaved_dict[player_id][1].append(fixture_penalties_saved)
+                    players_fixturesPenaltiesMissed_dict[player_id][0].append(fixture_penalties_missed) if gw < form_refGW else players_fixturesPenaltiesMissed_dict[player_id][1].append(fixture_penalties_missed)
+                    players_fixturesYellowCards_dict[player_id][0].append(fixture_yellow_cards) if gw < form_refGW else players_fixturesYellowCards_dict[player_id][1].append(fixture_yellow_cards)
+                    players_fixturesRedCards_dict[player_id][0].append(fixture_red_cards) if gw < form_refGW else players_fixturesRedCards_dict[player_id][1].append(fixture_red_cards)
+                    players_fixturesBonus_dict[player_id][0].append(fixture_bonus) if gw < form_refGW else players_fixturesBonus_dict[player_id][1].append(fixture_bonus)
                 else:
                     players_fixturesPts_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesPts_dict[player_id][1].append(None)
+                    players_fixturesMinutes_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesMinutes_dict[player_id][1].append(None)
+                    players_fixturesGoalsScored_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesGoalsScored_dict[player_id][1].append(None)
+                    players_fixturesGoalsConceded_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesGoalsConceded_dict[player_id][1].append(None)
+                    players_fixturesOwnGoals_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesOwnGoals_dict[player_id][1].append(None)
+                    players_fixturesAssists_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesAssists_dict[player_id][1].append(None)
+                    players_fixturesCleanSheets_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesCleanSheets_dict[player_id][1].append(None)
+                    players_fixturesSaves_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesSaves_dict[player_id][1].append(None)
+                    players_fixturesPenaltiesSaved_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesPenaltiesSaved_dict[player_id][1].append(None)
+                    players_fixturesPenaltiesMissed_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesPenaltiesMissed_dict[player_id][1].append(None)
+                    players_fixturesYellowCards_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesYellowCards_dict[player_id][1].append(None)
+                    players_fixturesRedCards_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesRedCards_dict[player_id][1].append(None)
+                    players_fixturesBonus_dict[player_id][0].append(None) if gw < form_refGW else players_fixturesBonus_dict[player_id][1].append(None)
                 if fixture_id in teams_fixturesPtsFor_dict[player_team][gw-1]:
                     teams_fixturesPtsFor_dict[player_team][gw-1][fixture_id] += fixture_pts
                     (teams_fixturesDefPts_dict if player_position in ['GKP', 'DEF'] else teams_fixturesAttPts_dict)[player_team][gw-1][fixture_id] += fixture_pts
 
 players_fixturesPlayedPts_dict = {player_id: [pts for pts in (fixturesPts[0] + fixturesPts[1]) if pts is not None] for player_id, fixturesPts in players_fixturesPts_dict.items()}
+players_fixturesPlayedMinutes_dict = {player_id: [mins for mins in (fixturesMins[0] + fixturesMins[1]) if mins is not None] for player_id, fixturesMins in players_fixturesMinutes_dict.items()}
+players_fixturesPlayedGoalsScored_dict = {player_id: [gs for gs in (fixturesGS[0] + fixturesGS[1]) if gs is not None] for player_id, fixturesGS in players_fixturesGoalsScored_dict.items()}
+players_fixturesPlayedGoalsConceded_dict = {player_id: [gc for gc in (fixturesGC[0] + fixturesGC[1]) if gc is not None] for player_id, fixturesGC in players_fixturesGoalsConceded_dict.items()}
+players_fixturesPlayedOwnGoals_dict = {player_id: [ogs for ogs in (fixturesOGS[0] + fixturesOGS[1]) if ogs is not None] for player_id, fixturesOGS in players_fixturesOwnGoals_dict.items()}
+players_fixturesPlayedAssists_dict = {player_id: [assists for assists in (fixturesAssists[0] + fixturesAssists[1]) if assists is not None] for player_id, fixturesAssists in players_fixturesAssists_dict.items()}
+players_fixturesPlayedCleanSheets_dict = {player_id: [cs for cs in (fixturesCS[0] + fixturesCS[1]) if cs is not None] for player_id, fixturesCS in players_fixturesCleanSheets_dict.items()}
+players_fixturesPlayedSaves_dict = {player_id: [svs for svs in (fixturesSVS[0] + fixturesSVS[1]) if svs is not None] for player_id, fixturesSVS in players_fixturesSaves_dict.items()}
+players_fixturesPlayedPenaltiesSaved_dict = {player_id: [ps for ps in (fixturesPS[0] + fixturesPS[1]) if ps is not None] for player_id, fixturesPS in players_fixturesPenaltiesSaved_dict.items()}
+players_fixturesPlayedPenaltiesMissed_dict = {player_id: [pm for pm in (fixturesPM[0] + fixturesPM[1]) if pm is not None] for player_id, fixturesPM in players_fixturesPenaltiesMissed_dict.items()}
+players_fixturesPlayedYellowCards_dict = {player_id: [ycs for ycs in (fixturesYCS[0] + fixturesYCS[1]) if ycs is not None] for player_id, fixturesYCS in players_fixturesYellowCards_dict.items()}
+players_fixturesPlayedRedCards_dict = {player_id: [rcs for rcs in (fixturesRCS[0] + fixturesRCS[1]) if rcs is not None] for player_id, fixturesRCS in players_fixturesRedCards_dict.items()}
+players_fixturesPlayedBonus_dict = {player_id: [bpts for bpts in (fixturesBPts[0] + fixturesBPts[1]) if bpts is not None] for player_id, fixturesBPts in players_fixturesBonus_dict.items()}
+
 players_formFixturesPts_dict = {player_id: [0 if pts is None else pts for pts in fixturesPts[1]] for player_id, fixturesPts in players_fixturesPts_dict.items()}
+players_formFixturesMinutes_dict = {player_id: [0 if mins is None else mins for mins in fixturesMins[1]] for player_id, fixturesMins in players_fixturesMinutes_dict.items()}
+players_formFixturesGoalsScored_dict = {player_id: [0 if gs is None else gs for gs in fixturesGS[1]] for player_id, fixturesGS in players_fixturesGoalsScored_dict.items()}
+players_formFixturesGoalsConceded_dict = {player_id: [0 if gc is None else gc for gc in fixturesGC[1]] for player_id, fixturesGC in players_fixturesGoalsConceded_dict.items()}
+players_formFixturesOwnGoals_dict = {player_id: [0 if ogs is None else ogs for ogs in fixturesOGS[1]] for player_id, fixturesOGS in players_fixturesOwnGoals_dict.items()}
+players_formFixturesAssists_dict = {player_id: [0 if assists is None else assists for assists in fixturesAssists[1]] for player_id, fixturesAssists in players_fixturesAssists_dict.items()}
+players_formFixturesCleanSheets_dict = {player_id: [0 if cs is None else cs for cs in fixturesCS[1]] for player_id, fixturesCS in players_fixturesCleanSheets_dict.items()}
+players_formFixturesSaves_dict = {player_id: [0 if svs is None else svs for svs in fixturesSVS[1]] for player_id, fixturesSVS in players_fixturesSaves_dict.items()}
+players_formFixturesPenaltiesSaved_dict = {player_id: [0 if ps is None else ps for ps in fixturesPS[1]] for player_id, fixturesPS in players_fixturesPenaltiesSaved_dict.items()}
+players_formFixturesPenaltiesMissed_dict = {player_id: [0 if pm is None else pm for pm in fixturesPM[1]] for player_id, fixturesPM in players_fixturesPenaltiesMissed_dict.items()}
+players_formFixturesYellowCards_dict = {player_id: [0 if ycs is None else ycs for ycs in fixturesYCS[1]] for player_id, fixturesYCS in players_fixturesYellowCards_dict.items()}
+players_formFixturesRedCards_dict = {player_id: [0 if rcs is None else rcs for rcs in fixturesRCS[1]] for player_id, fixturesRCS in players_fixturesRedCards_dict.items()}
+players_formFixturesBonus_dict = {player_id: [0 if bpts is None else bpts for bpts in fixturesBPts[1]] for player_id, fixturesBPts in players_fixturesBonus_dict.items()}
 
 for player_dict in players_stats:
     player_id = player_dict['id']
