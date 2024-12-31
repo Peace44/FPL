@@ -382,6 +382,35 @@ players_formFixturesYellowCards_dict = {player_id: [0 if ycs is None else ycs fo
 players_formFixturesRedCards_dict = {player_id: [0 if rcs is None else rcs for rcs in fixturesRCS[1]] for player_id, fixturesRCS in players_fixturesRedCards_dict.items()}
 players_formFixturesBonus_dict = {player_id: [0 if bpts is None else bpts for bpts in fixturesBPts[1]] for player_id, fixturesBPts in players_fixturesBonus_dict.items()}
 
+#---------------------------------------------------------------------------------------------------------#
+gkp_GS_pts = 10
+def_GS_pts = 6
+mid_GS_pts = 5
+fwd_GS_pts = 4
+#---------------------------------------------------------------------------------------------------------#
+gkp_GC_pts = def_GC_pts = -1/2
+mid_GC_pts = fwd_GC_pts = 0
+#---------------------------------------------------------------------------------------------------------#
+gkp_OG_pts = def_OG_pts = mid_OG_pts = fwd_OG_pts = -2
+#---------------------------------------------------------------------------------------------------------#
+gkp_A_pts = def_A_pts = mid_A_pts = fwd_A_pts = 3
+#---------------------------------------------------------------------------------------------------------#
+gkp_CS_pts = def_CS_pts = 4
+mid_CS_pts = 1
+fwd_CS_pts = 0
+#---------------------------------------------------------------------------------------------------------#
+gkp_S_pts = 1/3
+def_S_pts = mid_S_pts = fwd_S_pts = 0
+#---------------------------------------------------------------------------------------------------------#
+gkp_PS_pts = def_PS_pts = mid_PS_pts = fwd_PS_pts = 5
+#---------------------------------------------------------------------------------------------------------#
+gkp_PM_pts = def_PM_pts = mid_PM_pts = fwd_PM_pts = -2
+#---------------------------------------------------------------------------------------------------------#
+gkp_YC_pts = def_YC_pts = mid_YC_pts = fwd_YC_pts = -1
+#---------------------------------------------------------------------------------------------------------#
+gkp_RC_pts = def_RC_pts = mid_RC_pts = fwd_RC_pts = -3
+#---------------------------------------------------------------------------------------------------------#
+
 for player_dict in players_stats:
     player_id = player_dict['id']
     #---------------------------------------------------------------------------------------------------------#
@@ -587,20 +616,44 @@ for player_dict in players_stats:
     player_dict['avg_BP/fxtr_plyd'], player_dict['MeanAbsDev(BP/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedBonus, "mean")
     player_dict['StdDev(BP/fxtr_plyd)'] = np.std(player_fixturesPlayedBonus) if len(player_fixturesPlayedBonus) > 0 else 0
     #######################################################################################################################################################################################################################
-    print(player_dict, end="\n\n\n")
-    input()
+    player_position = player_dict['position']
+    match player_position:
+        case 'GKP':
+            # player_dict['x(med_formPts)'] = 
+            # player_dict['x(MedAbsDev(formPts))'] = 
+            # player_dict['x(formPts)'] = 
+            # player_dict['x(MeanAbsDev(formPts))'] = 
+            # player_dict['x(StdDev(formPts))'] =
+            # #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+            # player_dict['x(med_pts/fxtr)'] = 
+            # player_dict['x(MedAbsDev(pts/fxtr))'] = 
+            # player_dict['x(avg_pts/fxtr)'] = 
+            # player_dict['x(MeanAbsDev(pts/fxtr))'] = 
+            # player_dict['x(StdDev(pts/fxtr))'] =
+            # #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+            # player_dict['x(med_pts/fxtr_plyd)'] = 
+            # player_dict['x(MedAbsDev(pts/fxtr_plyd))'] = 
+            # player_dict['x(avg_pts/fxtr_plyd)'] = 
+            # player_dict['x(MeanAbsDev(pts/fxtr_plyd))'] = 
+            # player_dict['x(StdDev(pts/fxtr_plyd))'] =
+        case 'DEF':
+            pass
+        case 'MID':
+            pass
+        case 'FWD':
+            pass
     
 players_df = pd.DataFrame(players_stats).set_index('id', drop=False)
 players_df = players_df.sort_values([
     'team',
 
-    'med_formPts',                 'formPts',
+    'med_formPts',              'formPts',
     'med_pts/fxtr',             'avg_pts/fxtr',
     'med_pts/fxtr_plyd',        'avg_pts/fxtr_plyd',
 
     'tot_pts', ### I really hope this is the last sorting criteria!!! I wouldn't like the sorting to resort to the criteria below bcoz they might be problematic!!!
 
-    'MedAbsDev(formPts)',          'MeanAbsDev(formPts)',             'StdDev(formPts)',
+    'MedAbsDev(formPts)',       'MeanAbsDev(formPts)',          'StdDev(formPts)',
     'MedAbsDev(pts/fxtr)',      'MeanAbsDev(pts/fxtr)',         'StdDev(pts/fxtr)',
     'MedAbsDev(pts/fxtr_plyd)', 'MeanAbsDev(pts/fxtr_plyd)',    'StdDev(pts/fxtr_plyd)',
 ], 
