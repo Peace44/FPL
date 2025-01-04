@@ -511,7 +511,7 @@ for player_dict in players_stats:
     player_dict['med_formBP'], player_dict['MedAbsDev(formBP)'] = calculate_central_tendency_and_deviation(player_formFixturesBonus, "median")
     player_dict['formBP'], player_dict['MeanAbsDev(formBP)'] = calculate_central_tendency_and_deviation(player_formFixturesBonus, "mean")
     player_dict['StdDev(formBP)'] = np.std(player_formFixturesBonus) if len(player_formFixturesBonus) > 0 else 0
-    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
     player_dict['med_pts/fxtr'], player_dict['MedAbsDev(pts/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedX, "median")
     player_dict['avg_pts/fxtr'], player_dict['MeanAbsDev(pts/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts + player_fixturesNotPlayedX, "mean") ### avg_pts/fxtr is a player's average score per match, calculated from all matches played by his club throughout the whole season.
     player_dict['StdDev(pts/fxtr)'] = np.std(player_fixturesPlayedPts + player_fixturesNotPlayedX) if len(player_fixturesPlayedPts + player_fixturesNotPlayedX) > 0 else 0
@@ -563,7 +563,7 @@ for player_dict in players_stats:
     player_dict['med_BP/fxtr'], player_dict['MedAbsDev(BP/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedBonus + player_fixturesNotPlayedX, "median")
     player_dict['avg_BP/fxtr'], player_dict['MeanAbsDev(BP/fxtr)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedBonus + player_fixturesNotPlayedX, "mean")
     player_dict['StdDev(BP/fxtr)'] = np.std(player_fixturesPlayedBonus + player_fixturesNotPlayedX) if len(player_fixturesPlayedBonus + player_fixturesNotPlayedX) > 0 else 0
-    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
     player_dict['med_pts/fxtr_plyd'], player_dict['MedAbsDev(pts/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "median")
     player_dict['avg_pts/fxtr_plyd'], player_dict['MeanAbsDev(pts/fxtr_plyd)'] = calculate_central_tendency_and_deviation(player_fixturesPlayedPts, "mean")
     player_dict['StdDev(pts/fxtr_plyd)'] = np.std(player_fixturesPlayedPts) if len(player_fixturesPlayedPts) > 0 else 0
@@ -617,45 +617,285 @@ for player_dict in players_stats:
     player_dict['StdDev(BP/fxtr_plyd)'] = np.std(player_fixturesPlayedBonus) if len(player_fixturesPlayedBonus) > 0 else 0
     #######################################################################################################################################################################################################################
     player_position = player_dict['position']
+    #---------------------------------------------------------------------------------------------------------#
+    GS_pts = GC_pts = OG_pts = A_pts = CS_pts = S_pts = PS_pts = PM_pts = YC_pts = RC_pts = 0
+    
     match player_position:
         case 'GKP':
-            # player_dict['x(med_formPts)'] = 
-            # player_dict['x(MedAbsDev(formPts))'] = 
-            # player_dict['x(formPts)'] = 
-            # player_dict['x(MeanAbsDev(formPts))'] = 
-            # player_dict['x(StdDev(formPts))'] =
-            # #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-            # player_dict['x(med_pts/fxtr)'] = 
-            # player_dict['x(MedAbsDev(pts/fxtr))'] = 
-            # player_dict['x(avg_pts/fxtr)'] = 
-            # player_dict['x(MeanAbsDev(pts/fxtr))'] = 
-            # player_dict['x(StdDev(pts/fxtr))'] =
-            # #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-            # player_dict['x(med_pts/fxtr_plyd)'] = 
-            # player_dict['x(MedAbsDev(pts/fxtr_plyd))'] = 
-            # player_dict['x(avg_pts/fxtr_plyd)'] = 
-            # player_dict['x(MeanAbsDev(pts/fxtr_plyd))'] = 
-            # player_dict['x(StdDev(pts/fxtr_plyd))'] =
+            GS_pts  = gkp_GS_pts 
+            GC_pts  = gkp_GC_pts
+            OG_pts  = gkp_OG_pts
+            A_pts   = gkp_A_pts
+            CS_pts  = gkp_CS_pts
+            S_pts   = gkp_S_pts
+            PS_pts  = gkp_PS_pts
+            PM_pts  = gkp_PM_pts
+            YC_pts  = gkp_YC_pts
+            RC_pts  = gkp_RC_pts
         case 'DEF':
-            pass
+            GS_pts  = def_GS_pts 
+            GC_pts  = def_GC_pts
+            OG_pts  = def_OG_pts
+            A_pts   = def_A_pts
+            CS_pts  = def_CS_pts
+            S_pts   = def_S_pts
+            PS_pts  = def_PS_pts
+            PM_pts  = def_PM_pts
+            YC_pts  = def_YC_pts
+            RC_pts  = def_RC_pts
         case 'MID':
-            pass
+            GS_pts  = mid_GS_pts 
+            GC_pts  = mid_GC_pts
+            OG_pts  = mid_OG_pts
+            A_pts   = mid_A_pts
+            CS_pts  = mid_CS_pts
+            S_pts   = mid_S_pts
+            PS_pts  = mid_PS_pts
+            PM_pts  = mid_PM_pts
+            YC_pts  = mid_YC_pts
+            RC_pts  = mid_RC_pts
         case 'FWD':
-            pass
-    
+            GS_pts  = fwd_GS_pts
+            GC_pts  = fwd_GC_pts
+            OG_pts  = fwd_OG_pts
+            A_pts   = fwd_A_pts
+            CS_pts  = fwd_CS_pts
+            S_pts   = fwd_S_pts
+            PS_pts  = fwd_PS_pts
+            PM_pts  = fwd_PM_pts
+            YC_pts  = fwd_YC_pts
+            RC_pts  = fwd_RC_pts
+
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    med_formMP_pts  = (player_dict['med_formMP'] > 0 and player_dict['med_formMP'] < 60) * 1 + (player_dict['med_formMP'] >= 60) * 2
+    med_formGS_pts  = player_dict['med_formGS'] * GS_pts
+    med_formGC_pts  = player_dict['med_formGC'] * GC_pts
+    med_formOG_pts  = player_dict['med_formOG'] * OG_pts
+    med_formA_pts   = player_dict['med_formA']  * A_pts
+    med_formCS_pts  = player_dict['med_formCS'] * CS_pts
+    med_formS_pts   = player_dict['med_formS']  * S_pts
+    med_formPS_pts  = player_dict['med_formPS'] * PS_pts
+    med_formPM_pts  = player_dict['med_formPM'] * PM_pts
+    med_formYC_pts  = player_dict['med_formYC'] * YC_pts
+    med_formRC_pts  = player_dict['med_formRC'] * RC_pts
+    med_formB_pts   = player_dict['med_formBP'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    MedAbsDev_formMP_pts  = (player_dict['MedAbsDev(formMP)'] > 0 and player_dict['MedAbsDev(formMP)'] < 60) * 1 + (player_dict['MedAbsDev(formMP)'] >= 60) * 2
+    MedAbsDev_formGS_pts  = player_dict['MedAbsDev(formGS)'] * GS_pts
+    MedAbsDev_formGC_pts  = player_dict['MedAbsDev(formGC)'] * GC_pts
+    MedAbsDev_formOG_pts  = player_dict['MedAbsDev(formOG)'] * OG_pts
+    MedAbsDev_formA_pts   = player_dict['MedAbsDev(formA)']  * A_pts
+    MedAbsDev_formCS_pts  = player_dict['MedAbsDev(formCS)'] * CS_pts
+    MedAbsDev_formS_pts   = player_dict['MedAbsDev(formS)']  * S_pts
+    MedAbsDev_formPS_pts  = player_dict['MedAbsDev(formPS)'] * PS_pts
+    MedAbsDev_formPM_pts  = player_dict['MedAbsDev(formPM)'] * PM_pts
+    MedAbsDev_formYC_pts  = player_dict['MedAbsDev(formYC)'] * YC_pts
+    MedAbsDev_formRC_pts  = player_dict['MedAbsDev(formRC)'] * RC_pts
+    MedAbsDev_formB_pts   = player_dict['MedAbsDev(formBP)'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    formMP_pts  = (player_dict['formMP'] > 0 and player_dict['formMP'] < 60) * 1 + (player_dict['formMP'] >= 60) * 2
+    formGS_pts  = player_dict['formGS'] * GS_pts
+    formGC_pts  = player_dict['formGC'] * GC_pts
+    formOG_pts  = player_dict['formOG'] * OG_pts
+    formA_pts   = player_dict['formA']  * A_pts
+    formCS_pts  = player_dict['formCS'] * CS_pts
+    formS_pts   = player_dict['formS']  * S_pts
+    formPS_pts  = player_dict['formPS'] * PS_pts
+    formPM_pts  = player_dict['formPM'] * PM_pts
+    formYC_pts  = player_dict['formYC'] * YC_pts
+    formRC_pts  = player_dict['formRC'] * RC_pts
+    formB_pts   = player_dict['formBP'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    MeanAbsDev_formMP_pts  = (player_dict['MeanAbsDev(formMP)'] > 0 and player_dict['MeanAbsDev(formMP)'] < 60) * 1 + (player_dict['MeanAbsDev(formMP)'] >= 60) * 2
+    MeanAbsDev_formGS_pts  = player_dict['MeanAbsDev(formGS)'] * GS_pts
+    MeanAbsDev_formGC_pts  = player_dict['MeanAbsDev(formGC)'] * GC_pts
+    MeanAbsDev_formOG_pts  = player_dict['MeanAbsDev(formOG)'] * OG_pts
+    MeanAbsDev_formA_pts   = player_dict['MeanAbsDev(formA)']  * A_pts
+    MeanAbsDev_formCS_pts  = player_dict['MeanAbsDev(formCS)'] * CS_pts
+    MeanAbsDev_formS_pts   = player_dict['MeanAbsDev(formS)']  * S_pts
+    MeanAbsDev_formPS_pts  = player_dict['MeanAbsDev(formPS)'] * PS_pts
+    MeanAbsDev_formPM_pts  = player_dict['MeanAbsDev(formPM)'] * PM_pts
+    MeanAbsDev_formYC_pts  = player_dict['MeanAbsDev(formYC)'] * YC_pts
+    MeanAbsDev_formRC_pts  = player_dict['MeanAbsDev(formRC)'] * RC_pts
+    MeanAbsDev_formB_pts   = player_dict['MeanAbsDev(formBP)'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    StdDev_formMP_pts  = (player_dict['StdDev(formMP)'] > 0 and player_dict['StdDev(formMP)'] < 60) * 1 + (player_dict['StdDev(formMP)'] >= 60) * 2
+    StdDev_formGS_pts  = player_dict['StdDev(formGS)'] * GS_pts
+    StdDev_formGC_pts  = player_dict['StdDev(formGC)'] * GC_pts
+    StdDev_formOG_pts  = player_dict['StdDev(formOG)'] * OG_pts
+    StdDev_formA_pts   = player_dict['StdDev(formA)']  * A_pts
+    StdDev_formCS_pts  = player_dict['StdDev(formCS)'] * CS_pts
+    StdDev_formS_pts   = player_dict['StdDev(formS)']  * S_pts
+    StdDev_formPS_pts  = player_dict['StdDev(formPS)'] * PS_pts
+    StdDev_formPM_pts  = player_dict['StdDev(formPM)'] * PM_pts
+    StdDev_formYC_pts  = player_dict['StdDev(formYC)'] * YC_pts
+    StdDev_formRC_pts  = player_dict['StdDev(formRC)'] * RC_pts
+    StdDev_formB_pts   = player_dict['StdDev(formBP)'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    med_MP_pts_perFxtr  = (player_dict['med_MP/fxtr'] > 0 and player_dict['med_MP/fxtr'] < 60) * 1 + (player_dict['med_MP/fxtr'] >= 60) * 2
+    med_GS_pts_perFxtr  = player_dict['med_GS/fxtr'] * GS_pts
+    med_GC_pts_perFxtr  = player_dict['med_GC/fxtr'] * GC_pts
+    med_OG_pts_perFxtr  = player_dict['med_OG/fxtr'] * OG_pts
+    med_A_pts_perFxtr   = player_dict['med_A/fxtr']  * A_pts
+    med_CS_pts_perFxtr  = player_dict['med_CS/fxtr'] * CS_pts
+    med_S_pts_perFxtr   = player_dict['med_S/fxtr']  * S_pts
+    med_PS_pts_perFxtr  = player_dict['med_PS/fxtr'] * PS_pts
+    med_PM_pts_perFxtr  = player_dict['med_PM/fxtr'] * PM_pts
+    med_YC_pts_perFxtr  = player_dict['med_YC/fxtr'] * YC_pts
+    med_RC_pts_perFxtr  = player_dict['med_RC/fxtr'] * RC_pts
+    med_B_pts_perFxtr   = player_dict['med_BP/fxtr'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    MedAbsDev_MP_pts_perFxtr  = (player_dict['MedAbsDev(MP/fxtr)'] > 0 and player_dict['MedAbsDev(MP/fxtr)'] < 60) * 1 + (player_dict['MedAbsDev(MP/fxtr)'] >= 60) * 2
+    MedAbsDev_GS_pts_perFxtr  = player_dict['MedAbsDev(GS/fxtr)'] * GS_pts
+    MedAbsDev_GC_pts_perFxtr  = player_dict['MedAbsDev(GC/fxtr)'] * GC_pts
+    MedAbsDev_OG_pts_perFxtr  = player_dict['MedAbsDev(OG/fxtr)'] * OG_pts
+    MedAbsDev_A_pts_perFxtr   = player_dict['MedAbsDev(A/fxtr)']  * A_pts
+    MedAbsDev_CS_pts_perFxtr  = player_dict['MedAbsDev(CS/fxtr)'] * CS_pts
+    MedAbsDev_S_pts_perFxtr   = player_dict['MedAbsDev(S/fxtr)']  * S_pts
+    MedAbsDev_PS_pts_perFxtr  = player_dict['MedAbsDev(PS/fxtr)'] * PS_pts
+    MedAbsDev_PM_pts_perFxtr  = player_dict['MedAbsDev(PM/fxtr)'] * PM_pts
+    MedAbsDev_YC_pts_perFxtr  = player_dict['MedAbsDev(YC/fxtr)'] * YC_pts
+    MedAbsDev_RC_pts_perFxtr  = player_dict['MedAbsDev(RC/fxtr)'] * RC_pts
+    MedAbsDev_B_pts_perFxtr   = player_dict['MedAbsDev(BP/fxtr)'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    avg_MP_pts_perFxtr  = (player_dict['avg_MP/fxtr'] > 0 and player_dict['avg_MP/fxtr'] < 60) * 1 + (player_dict['avg_MP/fxtr'] >= 60) * 2
+    avg_GS_pts_perFxtr  = player_dict['avg_GS/fxtr'] * GS_pts
+    avg_GC_pts_perFxtr  = player_dict['avg_GC/fxtr'] * GC_pts
+    avg_OG_pts_perFxtr  = player_dict['avg_OG/fxtr'] * OG_pts
+    avg_A_pts_perFxtr   = player_dict['avg_A/fxtr']  * A_pts
+    avg_CS_pts_perFxtr  = player_dict['avg_CS/fxtr'] * CS_pts
+    avg_S_pts_perFxtr   = player_dict['avg_S/fxtr']  * S_pts
+    avg_PS_pts_perFxtr  = player_dict['avg_PS/fxtr'] * PS_pts
+    avg_PM_pts_perFxtr  = player_dict['avg_PM/fxtr'] * PM_pts
+    avg_YC_pts_perFxtr  = player_dict['avg_YC/fxtr'] * YC_pts
+    avg_RC_pts_perFxtr  = player_dict['avg_RC/fxtr'] * RC_pts
+    avg_B_pts_perFxtr   = player_dict['avg_BP/fxtr'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    MeanAbsDev_MP_pts_perFxtr  = (player_dict['MeanAbsDev(MP/fxtr)'] > 0 and player_dict['MeanAbsDev(MP/fxtr)'] < 60) * 1 + (player_dict['MeanAbsDev(MP/fxtr)'] >= 60) * 2
+    MeanAbsDev_GS_pts_perFxtr  = player_dict['MeanAbsDev(GS/fxtr)'] * GS_pts
+    MeanAbsDev_GC_pts_perFxtr  = player_dict['MeanAbsDev(GC/fxtr)'] * GC_pts
+    MeanAbsDev_OG_pts_perFxtr  = player_dict['MeanAbsDev(OG/fxtr)'] * OG_pts
+    MeanAbsDev_A_pts_perFxtr   = player_dict['MeanAbsDev(A/fxtr)']  * A_pts
+    MeanAbsDev_CS_pts_perFxtr  = player_dict['MeanAbsDev(CS/fxtr)'] * CS_pts
+    MeanAbsDev_S_pts_perFxtr   = player_dict['MeanAbsDev(S/fxtr)']  * S_pts
+    MeanAbsDev_PS_pts_perFxtr  = player_dict['MeanAbsDev(PS/fxtr)'] * PS_pts
+    MeanAbsDev_PM_pts_perFxtr  = player_dict['MeanAbsDev(PM/fxtr)'] * PM_pts
+    MeanAbsDev_YC_pts_perFxtr  = player_dict['MeanAbsDev(YC/fxtr)'] * YC_pts
+    MeanAbsDev_RC_pts_perFxtr  = player_dict['MeanAbsDev(RC/fxtr)'] * RC_pts
+    MeanAbsDev_B_pts_perFxtr   = player_dict['MeanAbsDev(BP/fxtr)'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    StdDev_MP_pts_perFxtr  = (player_dict['StdDev(MP/fxtr)'] > 0 and player_dict['StdDev(MP/fxtr)'] < 60) * 1 + (player_dict['StdDev(MP/fxtr)'] >= 60) * 2
+    StdDev_GS_pts_perFxtr  = player_dict['StdDev(GS/fxtr)'] * GS_pts
+    StdDev_GC_pts_perFxtr  = player_dict['StdDev(GC/fxtr)'] * GC_pts
+    StdDev_OG_pts_perFxtr  = player_dict['StdDev(OG/fxtr)'] * OG_pts
+    StdDev_A_pts_perFxtr   = player_dict['StdDev(A/fxtr)']  * A_pts
+    StdDev_CS_pts_perFxtr  = player_dict['StdDev(CS/fxtr)'] * CS_pts
+    StdDev_S_pts_perFxtr   = player_dict['StdDev(S/fxtr)']  * S_pts
+    StdDev_PS_pts_perFxtr  = player_dict['StdDev(PS/fxtr)'] * PS_pts
+    StdDev_PM_pts_perFxtr  = player_dict['StdDev(PM/fxtr)'] * PM_pts
+    StdDev_YC_pts_perFxtr  = player_dict['StdDev(YC/fxtr)'] * YC_pts
+    StdDev_RC_pts_perFxtr  = player_dict['StdDev(RC/fxtr)'] * RC_pts
+    StdDev_B_pts_perFxtr   = player_dict['StdDev(BP/fxtr)'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    med_MP_pts_perFxtrPlyd  = (player_dict['med_MP/fxtr_plyd'] > 0 and player_dict['med_MP/fxtr_plyd'] < 60) * 1 + (player_dict['med_MP/fxtr_plyd'] >= 60) * 2
+    med_GS_pts_perFxtrPlyd  = player_dict['med_GS/fxtr_plyd'] * GS_pts
+    med_GC_pts_perFxtrPlyd  = player_dict['med_GC/fxtr_plyd'] * GC_pts
+    med_OG_pts_perFxtrPlyd  = player_dict['med_OG/fxtr_plyd'] * OG_pts
+    med_A_pts_perFxtrPlyd   = player_dict['med_A/fxtr_plyd']  * A_pts
+    med_CS_pts_perFxtrPlyd  = player_dict['med_CS/fxtr_plyd'] * CS_pts
+    med_S_pts_perFxtrPlyd   = player_dict['med_S/fxtr_plyd']  * S_pts
+    med_PS_pts_perFxtrPlyd  = player_dict['med_PS/fxtr_plyd'] * PS_pts
+    med_PM_pts_perFxtrPlyd  = player_dict['med_PM/fxtr_plyd'] * PM_pts
+    med_YC_pts_perFxtrPlyd  = player_dict['med_YC/fxtr_plyd'] * YC_pts
+    med_RC_pts_perFxtrPlyd  = player_dict['med_RC/fxtr_plyd'] * RC_pts
+    med_B_pts_perFxtrPlyd   = player_dict['med_BP/fxtr_plyd'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    MedAbsDev_MP_pts_perFxtrPlyd  = (player_dict['MedAbsDev(MP/fxtr_plyd)'] > 0 and player_dict['MedAbsDev(MP/fxtr_plyd)'] < 60) * 1 + (player_dict['MedAbsDev(MP/fxtr_plyd)'] >= 60) * 2
+    MedAbsDev_GS_pts_perFxtrPlyd  = player_dict['MedAbsDev(GS/fxtr_plyd)'] * GS_pts
+    MedAbsDev_GC_pts_perFxtrPlyd  = player_dict['MedAbsDev(GC/fxtr_plyd)'] * GC_pts
+    MedAbsDev_OG_pts_perFxtrPlyd  = player_dict['MedAbsDev(OG/fxtr_plyd)'] * OG_pts
+    MedAbsDev_A_pts_perFxtrPlyd   = player_dict['MedAbsDev(A/fxtr_plyd)']  * A_pts
+    MedAbsDev_CS_pts_perFxtrPlyd  = player_dict['MedAbsDev(CS/fxtr_plyd)'] * CS_pts
+    MedAbsDev_S_pts_perFxtrPlyd   = player_dict['MedAbsDev(S/fxtr_plyd)']  * S_pts
+    MedAbsDev_PS_pts_perFxtrPlyd  = player_dict['MedAbsDev(PS/fxtr_plyd)'] * PS_pts
+    MedAbsDev_PM_pts_perFxtrPlyd  = player_dict['MedAbsDev(PM/fxtr_plyd)'] * PM_pts
+    MedAbsDev_YC_pts_perFxtrPlyd  = player_dict['MedAbsDev(YC/fxtr_plyd)'] * YC_pts
+    MedAbsDev_RC_pts_perFxtrPlyd  = player_dict['MedAbsDev(RC/fxtr_plyd)'] * RC_pts
+    MedAbsDev_B_pts_perFxtrPlyd   = player_dict['MedAbsDev(BP/fxtr_plyd)'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    avg_MP_pts_perFxtrPlyd  = (player_dict['avg_MP/fxtr_plyd'] > 0 and player_dict['avg_MP/fxtr_plyd'] < 60) * 1 + (player_dict['avg_MP/fxtr_plyd'] >= 60) * 2
+    avg_GS_pts_perFxtrPlyd  = player_dict['avg_GS/fxtr_plyd'] * GS_pts
+    avg_GC_pts_perFxtrPlyd  = player_dict['avg_GC/fxtr_plyd'] * GC_pts
+    avg_OG_pts_perFxtrPlyd  = player_dict['avg_OG/fxtr_plyd'] * OG_pts
+    avg_A_pts_perFxtrPlyd   = player_dict['avg_A/fxtr_plyd']  * A_pts
+    avg_CS_pts_perFxtrPlyd  = player_dict['avg_CS/fxtr_plyd'] * CS_pts
+    avg_S_pts_perFxtrPlyd   = player_dict['avg_S/fxtr_plyd']  * S_pts
+    avg_PS_pts_perFxtrPlyd  = player_dict['avg_PS/fxtr_plyd'] * PS_pts
+    avg_PM_pts_perFxtrPlyd  = player_dict['avg_PM/fxtr_plyd'] * PM_pts
+    avg_YC_pts_perFxtrPlyd  = player_dict['avg_YC/fxtr_plyd'] * YC_pts
+    avg_RC_pts_perFxtrPlyd  = player_dict['avg_RC/fxtr_plyd'] * RC_pts
+    avg_B_pts_perFxtrPlyd   = player_dict['avg_BP/fxtr_plyd'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    MeanAbsDev_MP_pts_perFxtrPlyd  = (player_dict['MeanAbsDev(MP/fxtr_plyd)'] > 0 and player_dict['MeanAbsDev(MP/fxtr_plyd)'] < 60) * 1 + (player_dict['MeanAbsDev(MP/fxtr_plyd)'] >= 60) * 2
+    MeanAbsDev_GS_pts_perFxtrPlyd  = player_dict['MeanAbsDev(GS/fxtr_plyd)'] * GS_pts
+    MeanAbsDev_GC_pts_perFxtrPlyd  = player_dict['MeanAbsDev(GC/fxtr_plyd)'] * GC_pts
+    MeanAbsDev_OG_pts_perFxtrPlyd  = player_dict['MeanAbsDev(OG/fxtr_plyd)'] * OG_pts
+    MeanAbsDev_A_pts_perFxtrPlyd   = player_dict['MeanAbsDev(A/fxtr_plyd)']  * A_pts
+    MeanAbsDev_CS_pts_perFxtrPlyd  = player_dict['MeanAbsDev(CS/fxtr_plyd)'] * CS_pts
+    MeanAbsDev_S_pts_perFxtrPlyd   = player_dict['MeanAbsDev(S/fxtr_plyd)']  * S_pts
+    MeanAbsDev_PS_pts_perFxtrPlyd  = player_dict['MeanAbsDev(PS/fxtr_plyd)'] * PS_pts
+    MeanAbsDev_PM_pts_perFxtrPlyd  = player_dict['MeanAbsDev(PM/fxtr_plyd)'] * PM_pts
+    MeanAbsDev_YC_pts_perFxtrPlyd  = player_dict['MeanAbsDev(YC/fxtr_plyd)'] * YC_pts
+    MeanAbsDev_RC_pts_perFxtrPlyd  = player_dict['MeanAbsDev(RC/fxtr_plyd)'] * RC_pts
+    MeanAbsDev_B_pts_perFxtrPlyd   = player_dict['MeanAbsDev(BP/fxtr_plyd)'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    StdDev_MP_pts_perFxtrPlyd  = (player_dict['StdDev(MP/fxtr_plyd)'] > 0 and player_dict['StdDev(MP/fxtr_plyd)'] < 60) * 1 + (player_dict['StdDev(MP/fxtr_plyd)'] >= 60) * 2
+    StdDev_GS_pts_perFxtrPlyd  = player_dict['StdDev(GS/fxtr_plyd)'] * GS_pts
+    StdDev_GC_pts_perFxtrPlyd  = player_dict['StdDev(GC/fxtr_plyd)'] * GC_pts
+    StdDev_OG_pts_perFxtrPlyd  = player_dict['StdDev(OG/fxtr_plyd)'] * OG_pts
+    StdDev_A_pts_perFxtrPlyd   = player_dict['StdDev(A/fxtr_plyd)']  * A_pts
+    StdDev_CS_pts_perFxtrPlyd  = player_dict['StdDev(CS/fxtr_plyd)'] * CS_pts
+    StdDev_S_pts_perFxtrPlyd   = player_dict['StdDev(S/fxtr_plyd)']  * S_pts
+    StdDev_PS_pts_perFxtrPlyd  = player_dict['StdDev(PS/fxtr_plyd)'] * PS_pts
+    StdDev_PM_pts_perFxtrPlyd  = player_dict['StdDev(PM/fxtr_plyd)'] * PM_pts
+    StdDev_YC_pts_perFxtrPlyd  = player_dict['StdDev(YC/fxtr_plyd)'] * YC_pts
+    StdDev_RC_pts_perFxtrPlyd  = player_dict['StdDev(RC/fxtr_plyd)'] * RC_pts
+    StdDev_B_pts_perFxtrPlyd   = player_dict['StdDev(BP/fxtr_plyd)'] * 1
+    #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
+    #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    player_dict['x(med_formPts)'] = med_formMP_pts + med_formGS_pts + med_formGC_pts + med_formOG_pts + med_formA_pts + med_formCS_pts + med_formS_pts + med_formPS_pts + med_formPM_pts + med_formYC_pts + med_formRC_pts + med_formB_pts    
+    player_dict['x(MedAbsDev(formPts))'] = MedAbsDev_formMP_pts + MedAbsDev_formGS_pts + MedAbsDev_formGC_pts + MedAbsDev_formOG_pts + MedAbsDev_formA_pts + MedAbsDev_formCS_pts + MedAbsDev_formS_pts + MedAbsDev_formPS_pts + MedAbsDev_formPM_pts + MedAbsDev_formYC_pts + MedAbsDev_formRC_pts + MedAbsDev_formB_pts
+    player_dict['x(formPts)'] = formMP_pts + formGS_pts + formGC_pts + formOG_pts + formA_pts + formCS_pts + formS_pts + formPS_pts + formPM_pts + formYC_pts + formRC_pts + formB_pts
+    player_dict['x(MeanAbsDev(formPts))'] = MeanAbsDev_formMP_pts + MeanAbsDev_formGS_pts + MeanAbsDev_formGC_pts + MeanAbsDev_formOG_pts + MeanAbsDev_formA_pts + MeanAbsDev_formCS_pts + MeanAbsDev_formS_pts + MeanAbsDev_formPS_pts + MeanAbsDev_formPM_pts + MeanAbsDev_formYC_pts + MeanAbsDev_formRC_pts + MeanAbsDev_formB_pts
+    player_dict['x(StdDev(formPts))'] = StdDev_formMP_pts + StdDev_formGS_pts + StdDev_formGC_pts + StdDev_formOG_pts + StdDev_formA_pts + StdDev_formCS_pts + StdDev_formS_pts + StdDev_formPS_pts + StdDev_formPM_pts + StdDev_formYC_pts + StdDev_formRC_pts + StdDev_formB_pts
+    #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    player_dict['x(med_pts/fxtr)'] = med_MP_pts_perFxtr + med_GS_pts_perFxtr + med_GC_pts_perFxtr + med_OG_pts_perFxtr + med_A_pts_perFxtr + med_CS_pts_perFxtr + med_S_pts_perFxtr + med_PS_pts_perFxtr + med_PM_pts_perFxtr + med_YC_pts_perFxtr + med_RC_pts_perFxtr + med_B_pts_perFxtr
+    player_dict['x(MedAbsDev(pts/fxtr))'] = MedAbsDev_MP_pts_perFxtr + MedAbsDev_GS_pts_perFxtr + MedAbsDev_GC_pts_perFxtr + MedAbsDev_OG_pts_perFxtr + MedAbsDev_A_pts_perFxtr + MedAbsDev_CS_pts_perFxtr + MedAbsDev_S_pts_perFxtr + MedAbsDev_PS_pts_perFxtr + MedAbsDev_PM_pts_perFxtr + MedAbsDev_YC_pts_perFxtr + MedAbsDev_RC_pts_perFxtr + MedAbsDev_B_pts_perFxtr
+    player_dict['x(avg_pts/fxtr)'] = avg_MP_pts_perFxtr + avg_GS_pts_perFxtr + avg_GC_pts_perFxtr + avg_OG_pts_perFxtr + avg_A_pts_perFxtr + avg_CS_pts_perFxtr + avg_S_pts_perFxtr + avg_PS_pts_perFxtr + avg_PM_pts_perFxtr + avg_YC_pts_perFxtr + avg_RC_pts_perFxtr + avg_B_pts_perFxtr
+    player_dict['x(MeanAbsDev(pts/fxtr))'] = MeanAbsDev_MP_pts_perFxtr + MeanAbsDev_GS_pts_perFxtr + MeanAbsDev_GC_pts_perFxtr + MeanAbsDev_OG_pts_perFxtr + MeanAbsDev_A_pts_perFxtr + MeanAbsDev_CS_pts_perFxtr + MeanAbsDev_S_pts_perFxtr + MeanAbsDev_PS_pts_perFxtr + MeanAbsDev_PM_pts_perFxtr + MeanAbsDev_YC_pts_perFxtr + MeanAbsDev_RC_pts_perFxtr + MeanAbsDev_B_pts_perFxtr
+    player_dict['x(StdDev(pts/fxtr))'] =  StdDev_MP_pts_perFxtr + StdDev_GS_pts_perFxtr + StdDev_GC_pts_perFxtr + StdDev_OG_pts_perFxtr + StdDev_A_pts_perFxtr + StdDev_CS_pts_perFxtr + StdDev_S_pts_perFxtr + StdDev_PS_pts_perFxtr + StdDev_PM_pts_perFxtr + StdDev_YC_pts_perFxtr + StdDev_RC_pts_perFxtr + StdDev_B_pts_perFxtr
+    #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    player_dict['x(med_pts/fxtr_plyd)'] = med_MP_pts_perFxtrPlyd + med_GS_pts_perFxtrPlyd + med_GC_pts_perFxtrPlyd + med_OG_pts_perFxtrPlyd + med_A_pts_perFxtrPlyd + med_CS_pts_perFxtrPlyd + med_S_pts_perFxtrPlyd + med_PS_pts_perFxtrPlyd + med_PM_pts_perFxtrPlyd + med_YC_pts_perFxtrPlyd + med_RC_pts_perFxtrPlyd + med_B_pts_perFxtrPlyd
+    player_dict['x(MedAbsDev(pts/fxtr_plyd))'] = MedAbsDev_MP_pts_perFxtrPlyd + MedAbsDev_GS_pts_perFxtrPlyd + MedAbsDev_GC_pts_perFxtrPlyd + MedAbsDev_OG_pts_perFxtrPlyd + MedAbsDev_A_pts_perFxtrPlyd + MedAbsDev_CS_pts_perFxtrPlyd + MedAbsDev_S_pts_perFxtrPlyd + MedAbsDev_PS_pts_perFxtrPlyd + MedAbsDev_PM_pts_perFxtrPlyd + MedAbsDev_YC_pts_perFxtrPlyd + MedAbsDev_RC_pts_perFxtrPlyd + MedAbsDev_B_pts_perFxtrPlyd
+    player_dict['x(avg_pts/fxtr_plyd)'] = avg_MP_pts_perFxtrPlyd + avg_GS_pts_perFxtrPlyd + avg_GC_pts_perFxtrPlyd + avg_OG_pts_perFxtrPlyd + avg_A_pts_perFxtrPlyd + avg_CS_pts_perFxtrPlyd + avg_S_pts_perFxtrPlyd + avg_PS_pts_perFxtrPlyd + avg_PM_pts_perFxtrPlyd + avg_YC_pts_perFxtrPlyd + avg_RC_pts_perFxtrPlyd + avg_B_pts_perFxtrPlyd
+    player_dict['x(MeanAbsDev(pts/fxtr_plyd))'] = MeanAbsDev_MP_pts_perFxtrPlyd + MeanAbsDev_GS_pts_perFxtrPlyd + MeanAbsDev_GC_pts_perFxtrPlyd + MeanAbsDev_OG_pts_perFxtrPlyd + MeanAbsDev_A_pts_perFxtrPlyd + MeanAbsDev_CS_pts_perFxtrPlyd + MeanAbsDev_S_pts_perFxtrPlyd + MeanAbsDev_PS_pts_perFxtrPlyd + MeanAbsDev_PM_pts_perFxtrPlyd + MeanAbsDev_YC_pts_perFxtrPlyd + MeanAbsDev_RC_pts_perFxtrPlyd + MeanAbsDev_B_pts_perFxtrPlyd
+    player_dict['x(StdDev(pts/fxtr_plyd))'] = StdDev_MP_pts_perFxtrPlyd + StdDev_GS_pts_perFxtrPlyd + StdDev_GC_pts_perFxtrPlyd + StdDev_OG_pts_perFxtrPlyd + StdDev_A_pts_perFxtrPlyd + StdDev_CS_pts_perFxtrPlyd + StdDev_S_pts_perFxtrPlyd + StdDev_PS_pts_perFxtrPlyd + StdDev_PM_pts_perFxtrPlyd + StdDev_YC_pts_perFxtrPlyd + StdDev_RC_pts_perFxtrPlyd + StdDev_B_pts_perFxtrPlyd
+    #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
 players_df = pd.DataFrame(players_stats).set_index('id', drop=False)
 players_df = players_df.sort_values([
     'team',
 
-    'med_formPts',              'formPts',
-    'med_pts/fxtr',             'avg_pts/fxtr',
-    'med_pts/fxtr_plyd',        'avg_pts/fxtr_plyd',
+    'x(med_formPts)',              'x(formPts)',
+    'x(med_pts/fxtr)',             'x(avg_pts/fxtr)',
+    'x(med_pts/fxtr_plyd)',        'x(avg_pts/fxtr_plyd)',
 
     'tot_pts', ### I really hope this is the last sorting criteria!!! I wouldn't like the sorting to resort to the criteria below bcoz they might be problematic!!!
 
-    'MedAbsDev(formPts)',       'MeanAbsDev(formPts)',          'StdDev(formPts)',
-    'MedAbsDev(pts/fxtr)',      'MeanAbsDev(pts/fxtr)',         'StdDev(pts/fxtr)',
-    'MedAbsDev(pts/fxtr_plyd)', 'MeanAbsDev(pts/fxtr_plyd)',    'StdDev(pts/fxtr_plyd)',
+    'x(MedAbsDev(formPts))',       'x(MeanAbsDev(formPts))',          'x(StdDev(formPts))',
+    'x(MedAbsDev(pts/fxtr))',      'x(MeanAbsDev(pts/fxtr))',         'x(StdDev(pts/fxtr))',
+    'x(MedAbsDev(pts/fxtr_plyd))', 'x(MeanAbsDev(pts/fxtr_plyd))',    'x(StdDev(pts/fxtr_plyd))',
 ], 
 ascending=[
     True, 
@@ -1046,13 +1286,14 @@ for fixture in fixtures_data: # for fixture in upcoming_fixtures_data
         att_teamsAdv_dict[home_team] = att_teamsAdv_dict.get(home_team, 0) + fixture_dict['home_attAdv']
         att_teamsAdv_dict[away_team] = att_teamsAdv_dict.get(away_team, 0) + fixture_dict['away_attAdv']
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
-        fplHomeAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['home_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        fplAwayAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['away_fplAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        defHomeAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['home_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        defAwayAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['away_defAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        attHomeAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['home_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
-        attAwayAdv_playerGoldenSum_xPtsParam1 = players_df['med_pts/fxtr'] + (fixture_dict['away_attAdv'] / 9) * players_df['MedAbsDev(pts/fxtr)']
+        fplHomeAdv_playerGoldenSum_xPtsParam1 = players_df['x(med_pts/fxtr)'] + (fixture_dict['home_fplAdv'] / 9) * players_df['x(MedAbsDev(pts/fxtr))']
+        fplAwayAdv_playerGoldenSum_xPtsParam1 = players_df['x(med_pts/fxtr)'] + (fixture_dict['away_fplAdv'] / 9) * players_df['x(MedAbsDev(pts/fxtr))']
+        defHomeAdv_playerGoldenSum_xPtsParam1 = players_df['x(med_pts/fxtr)'] + (fixture_dict['home_defAdv'] / 9) * players_df['x(MedAbsDev(pts/fxtr))']
+        defAwayAdv_playerGoldenSum_xPtsParam1 = players_df['x(med_pts/fxtr)'] + (fixture_dict['away_defAdv'] / 9) * players_df['x(MedAbsDev(pts/fxtr))']
+        attHomeAdv_playerGoldenSum_xPtsParam1 = players_df['x(med_pts/fxtr)'] + (fixture_dict['home_attAdv'] / 9) * players_df['x(MedAbsDev(pts/fxtr))']
+        attAwayAdv_playerGoldenSum_xPtsParam1 = players_df['x(med_pts/fxtr)'] + (fixture_dict['away_attAdv'] / 9) * players_df['x(MedAbsDev(pts/fxtr))']
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         fplHomeAdv_playerGoldenSum_xPtsParam2 = None
         fplAwayAdv_playerGoldenSum_xPtsParam2 = None
@@ -1068,6 +1309,7 @@ for fixture in fixtures_data: # for fixture in upcoming_fixtures_data
         attHomeAdv_playerGoldenSum_xPtsParam3 = None
         attAwayAdv_playerGoldenSum_xPtsParam3 = None
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         players_df.loc[players_df['team'] == home_team, 'xPts(fplAdv)'] += golden_sum(
             fplHomeAdv_playerGoldenSum_xPtsParam1,
@@ -1102,6 +1344,7 @@ for fixture in fixtures_data: # for fixture in upcoming_fixtures_data
             attAwayAdv_playerGoldenSum_xPtsParam3,
         )
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+
         #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
         teams_nxtGWsNberOfMatches_dict[home_team] = teams_nxtGWsNberOfMatches_dict.get(home_team, 0) + 1
         teams_nxtGWsNberOfMatches_dict[away_team] = teams_nxtGWsNberOfMatches_dict.get(away_team, 0) + 1
