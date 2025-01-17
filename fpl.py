@@ -679,7 +679,7 @@ for player_dict in players_stats:
     player_position = player_dict['position']
     
     #-------------------------------------------------------------------------------------------------#
-    print(player_dict['web_name'])
+    # print(player_dict['web_name'])
     #-------------------------------------------------------------------------------------------------#
     for i in ['form', '/fxtr', '/fxtr_plyd']:    
         for j in ['med', 'MedAbsDev', 'avg', 'MeanAbsDev', 'StdDev']:
@@ -696,14 +696,14 @@ for player_dict in players_stats:
                     ijk_pts = abs(ijk_pts)
                 ij_pts += ijk_pts
                 #-------------------------------------------------------------------------------------------------#
-                print(ijk_str + ':\t\t' + str(x) + "\t==>\t" + str(ijk_pts) + ' pts')
+                # print(ijk_str + ':\t\t' + str(x) + "\t==>\t" + str(ijk_pts) + ' pts')
                 #-------------------------------------------------------------------------------------------------#
             player_dict[ij_str] = ij_pts
             #-------------------------------------------------------------------------------------------------#
-            print(ij_str + ':\t\t\t==>\t' + str(ij_pts) + ' pts')
-            abc = ((j + '_' + i_str) if (j == 'med' or j == 'avg') else (j + '(' + i_str + ')'))
-            print(abc + ':\t\t\t==>\t' + str(player_dict[abc]) + ' pts')
-            input()
+            # print(ij_str + ':\t\t\t==>\t' + str(ij_pts) + ' pts')
+            # abc = ((j + '_' + i_str) if (j == 'med' or j == 'avg') else (j + '(' + i_str + ')'))
+            # print(abc + ':\t\t\t==>\t' + str(player_dict[abc]) + ' pts')
+            # input()
             #-------------------------------------------------------------------------------------------------#
 
 players_df = pd.DataFrame(players_stats).set_index('id', drop=False)
